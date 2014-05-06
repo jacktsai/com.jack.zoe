@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/com.jack.zoe.iml" filepath="$PROJECT_DIR$/com.jack.zoe.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jacktsai.iml" filepath="$PROJECT_DIR$/jacktsai.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zoe/zoe.iml" filepath="$PROJECT_DIR$/zoe/zoe.iml" />
+    </modules>
+  </component>
+</project>
+

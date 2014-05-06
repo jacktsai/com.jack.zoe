@@ -1,0 +1,77 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="${packageName}.${activityClass}">
+
+    <ImageView
+        android:id="@+id/zoePicture"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
+
+    <TextView
+        android:id="@+id/greetings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/zoePicture"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="15dp"
+        android:text="@string/greetings" />
+
+    <TextView
+        android:id="@+id/message1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/greetings"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/greetings"
+        android:text="@string/message1" />
+
+    <TextView
+        android:id="@+id/message2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/message1"
+        android:layout_below="@+id/message1"
+        android:layout_marginTop="10dp"
+        android:text="@string/message2" />
+
+    <TextView
+        android:id="@+id/message3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/message2"
+        android:layout_below="@+id/message2"
+        android:layout_marginTop="10dp"
+        android:text="@string/message3" />
+
+    <TextView
+        android:id="@+id/message4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/message3"
+        android:layout_below="@+id/message3"
+        android:layout_marginTop="10dp"
+        android:text="@string/message4" />
+
+    <TextView
+        android:id="@+id/message5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/message4"
+        android:layout_below="@+id/message4"
+        android:layout_marginTop="10dp"
+        android:text="@string/message5" />
+
+    <TextView
+        android:id="@+id/signature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"
+        android:text="@string/signature" />
+
+</RelativeLayout>
