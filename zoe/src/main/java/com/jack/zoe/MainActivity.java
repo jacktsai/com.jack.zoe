@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.widget.ImageView;
 
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -24,17 +25,14 @@ public class MainActivity extends Activity {
         this.messageAnimator = new MessageAnimation(this);
         this.messageAnimator.start();
 
-        this.mp3Player = MediaPlayer.create(this, R.raw.dance_of_the_dragonfly);
-        this.mp3Player.setLooping(true);
-        this.mp3Player.start();
+        this.startBGM();
     }
 
     @Override
     protected void onDestroy() {
-        this.mp3Player.stop();
-        this.mp3Player.release();
+        this.stopBGM();
         this.messageAnimator.cancel();
-        this.endRollingPicture();
+        this.stopRollingPicture();
         super.onDestroy();
     }
 
@@ -71,7 +69,27 @@ public class MainActivity extends Activity {
         new Timer().schedule(pictureRollingTask, 100, 3000);
     }
 
-    private void endRollingPicture() {
+    private void stopRollingPicture() {
         this.pictureRollingTask.cancel();
+    }
+
+    private void startBGM() {
+        int[] mp3Array = new int[] { R.raw.dance_of_the_dragonfly, R.raw.sundial_reams, R.raw.through_the_arbor };
+        Random r = new Random();
+        int selectedMp3 = mp3Array[r.nextInt(3)];
+
+        this.mp3Player = MediaPlayer.create(this, selectedMp3);
+        this.mp3Player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                startBGM();
+            }
+        });
+        this.mp3Player.start();
+    }
+
+    private void stopBGM(){
+        this.mp3Player.stop();
+        this.mp3Player.release();
     }
 }
