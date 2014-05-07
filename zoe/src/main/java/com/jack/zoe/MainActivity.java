@@ -1,21 +1,15 @@
 package com.jack.zoe;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.util.Random;
 import java.util.Timer;
@@ -28,7 +22,6 @@ public class MainActivity extends Activity {
     private int[] picArray = new int[] { R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d, R.drawable.e, R.drawable.f, R.drawable.g, R.drawable.h, R.drawable.i, R.drawable.j };
     private int currentImageIndex = 0;
     private Timer imageScrollTimer;
-    private TimerTask imageScrollTask;
     private ViewPager imagePager;
     private MessageAnimation messageAnimator;
     private MediaPlayer mp3Player;
@@ -125,14 +118,12 @@ public class MainActivity extends Activity {
     }
 
     private void startScrollImage() {
-        this.imageScrollTask = new ImageScrollTask();
         this.imageScrollTimer = new Timer();
-        this.imageScrollTimer.schedule(this.imageScrollTask, 5000);
+        this.imageScrollTimer.schedule(new ImageScrollTask(), 5000);
     }
 
     private void stopScrollImage() {
         this.imageScrollTimer.cancel();
-        this.imageScrollTask.cancel();
     }
 
     private void startBGM() {
