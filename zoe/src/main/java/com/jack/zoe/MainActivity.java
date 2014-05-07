@@ -3,6 +3,10 @@ package com.jack.zoe;
 import android.app.Activity;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
 
 import java.util.Random;
@@ -15,6 +19,8 @@ public class MainActivity extends Activity {
     private MessageAnimation messageAnimator;
     private MediaPlayer mp3Player;
 
+    private GestureDetector gd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,12 +31,40 @@ public class MainActivity extends Activity {
         this.messageAnimator = new MessageAnimation(this);
         this.messageAnimator.start();
 
-        this.startBGM();
+//        this.startBGM();
+
+
+        this.gd = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                if ( Math.abs(velocityX) > 200)
+                {
+                    float x1 = e1.getX(), x2 = e2.getX();
+
+                    if (Math.abs(x1 - x2) > 120) {
+                        if ( x1 > x2 ) {
+                            Log.e("Main", "Swipe from right to left.");
+                        } else {
+                            Log.e("Main", "Swipe from left to right.");
+                        }
+
+                        return true;
+                    }
+                }
+
+                return super.onFling(e1, e2, velocityX, velocityY);
+            }
+        });
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return this.gd.onTouchEvent(event);
     }
 
     @Override
     protected void onDestroy() {
-        this.stopBGM();
+//        this.stopBGM();
         this.messageAnimator.cancel();
         this.stopRollingPicture();
         super.onDestroy();
@@ -74,7 +108,7 @@ public class MainActivity extends Activity {
     }
 
     private void startBGM() {
-        int[] mp3Array = new int[] { R.raw.dance_of_the_dragonfly, R.raw.sundial_reams, R.raw.through_the_arbor };
+        int[] mp3Array = new int[] { R.raw.dance_of_the_dragonfly/*, R.raw.sundial_reams, R.raw.through_the_arbor*/ };
         Random r = new Random();
         int selectedMp3 = mp3Array[r.nextInt(3)];
 
