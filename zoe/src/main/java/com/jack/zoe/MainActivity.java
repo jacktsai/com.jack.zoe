@@ -1,9 +1,12 @@
 package com.jack.zoe;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -33,6 +36,8 @@ public class MainActivity extends Activity {
         super.setTitle(R.string.main_title);
         super.onCreate(savedInstanceState);
         super.setContentView(R.layout.activity_main);
+
+        super.startService(new Intent(MainActivity.this, NotificationListener.class));
 
         this.messageAnimator = new MessageAnimation();
         this.messageAnimator.start();
@@ -287,12 +292,30 @@ public class MainActivity extends Activity {
 
             this.timer = new Timer();
             this.timer.schedule(task, 1000, 200);
+
+            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this);
+            builder.setContentTitle("My Notification");
+            builder.setContentText("start");
+            builder.setTicker("Notification Listener Service Example");
+            builder.setSmallIcon(R.drawable.ic_launcher);
+            builder.setAutoCancel(true);
+            manager.notify((int) System.currentTimeMillis(), builder.build());
         }
 
         public void cancel() {
             if (this.timer != null) {
                 this.timer.cancel();
                 this.timer = null;
+
+                NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this);
+                builder.setContentTitle("My Notification");
+                builder.setContentText("completed");
+                builder.setTicker("Notification Listener Service Example");
+                builder.setSmallIcon(R.drawable.ic_launcher);
+                builder.setAutoCancel(true);
+                manager.notify((int) System.currentTimeMillis(), builder.build());
             }
         }
 
