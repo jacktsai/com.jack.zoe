@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         super.setContentView(R.layout.activity_main);
 
-        super.startService(new Intent(MainActivity.this, NotificationListener.class));
+        //super.startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
 
         this.messageAnimator = new MessageAnimation();
         this.messageAnimator.start();
