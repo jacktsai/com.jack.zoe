@@ -11,29 +11,43 @@ import android.widget.RemoteViews;
 import com.jack.zoe.util.*;
 
 import java.io.InvalidObjectException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NotificationListener extends NotificationListenerService {
 
     private MediaPlayer mediaPlayer;
+    private List<String> nlsIds = new ArrayList<String>();
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
         this.printNotification("onNotificationPosted", sbn);
 
-        if (this.isSpecifiedTarget(sbn) && mediaPlayer == null) {
-            mediaPlayer = MediaPlayer.create(super.getApplicationContext(), R.raw.alarm);
-            mediaPlayer.setVolume(1, 1);
-            mediaPlayer.setLooping(true);
-            mediaPlayer.start();
+        if (this.isSpecifiedTarget(sbn)) {
+
+            if (nlsIds.isEmpty()) {
+                mediaPlayer = MediaPlayer.create(super.getApplicationContext(), R.raw.alarm);
+                mediaPlayer.setVolume(1, 1);
+                mediaPlayer.setLooping(true);
+                mediaPlayer.start();
+            }
+
+            String id = Integer.toString(sbn.getId());
+            nlsIds.add(id);
         }
     }
 
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
-        if (this.isSpecifiedTarget(sbn) && mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
+        String id = Integer.toString(sbn.getId());
+
+        if (!nlsIds.isEmpty()) {
+
+            if (nlsIds.remove(id) && nlsIds.isEmpty()) {
+                mediaPlayer.stop();
+                mediaPlayer.release();
+                mediaPlayer = null;
+            }
         }
     }
 
