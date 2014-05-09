@@ -3,6 +3,7 @@ package com.jack.notifier;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.view.Menu;
@@ -22,14 +23,34 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Notification.Builder builder = new Notification.Builder(MainActivity.this);
-                builder.setContentTitle("通知測試");
-                builder.setContentText("測試用內容");
-                builder.setTicker("這是一個通知測試，請慢慢享用～");
+                builder.setContentTitle("ContentTitle");
+                builder.setContentText("ContentText");
+                builder.setContentInfo("ContentInfo");
+                builder.setSubText("SubText");
+                builder.setTicker("TickerText");
                 builder.setSmallIcon(R.drawable.ic_launcher);
-                builder.setAutoCancel(false);
 
                 NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                 manager.notify((int)System.currentTimeMillis(), builder.build());
+            }
+        });
+
+        final Button playAlarm = (Button)super.findViewById(R.id.playAlarm);
+        playAlarm.setOnClickListener(new View.OnClickListener() {
+            private MediaPlayer player;
+
+            @Override
+            public void onClick(View v) {
+                if (player == null) {
+                    player = MediaPlayer.create(MainActivity.this, R.raw.alarm);
+                    player.setVolume(1, 1);
+                    player.setLooping(true);
+                    player.start();
+                } else {
+                    player.stop();
+                    player.release();
+                    player = null;
+                }
             }
         });
     }

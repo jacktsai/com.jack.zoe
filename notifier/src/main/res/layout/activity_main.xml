@@ -11,4 +11,10 @@
         android:text="建立通知"
         android:id="@+id/createNotification" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="撥放警告"
+        android:id="@+id/playAlarm" />
+
 </LinearLayout>

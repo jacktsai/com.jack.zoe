@@ -1,8 +1,16 @@
 package com.jack.zoe.util;
 
+import android.app.Application;
+import android.content.ContextWrapper;
 import android.os.Environment;
 import android.service.notification.StatusBarNotification;
+import android.text.format.Time;
 import android.util.Log;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class J {
 
@@ -11,6 +19,11 @@ public class J {
     public static void d(String format, Object... args) {
         String message = String.format(format, args);
         Log.d(TAG, message);
+    }
+
+    public static void e(String format, Object... args) {
+        String message = String.format(format, args);
+        Log.e(TAG, message);
     }
 
     public static void printStackTrace() {
@@ -32,11 +45,39 @@ public class J {
         }
     }
 
-    private void logNotification(String eventName, StatusBarNotification sbn) {
-        J.d("External Storage State: %s", Environment.getExternalStorageState());
+    public static void log(String format, Object... args) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            File externalDir = Environment.getExternalStorageDirectory();
+            File zoeDir = new File(externalDir, "com.jack.zoe");
 
-        if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
+            synchronized (J.class) {
+                if (!zoeDir.exists()) {
+                    if (!zoeDir.mkdir()) {
+                        e("failed to create directory %s", zoeDir.getPath());
+                        return;
+                    }
+                }
 
+                Time now = new Time();
+                now.setToNow();
+
+                File logFile = new File(zoeDir, now.format("%y%m%d") + ".log");
+                String message = String.format(format, args);
+                String line = String.format("%s %s\n", now.format("%H:%M:%S"), message);
+
+                try {
+                    FileWriter writer = new FileWriter(logFile, logFile.exists());
+                    writer.write(line);
+                    writer.flush();
+                    writer.close();
+
+                    d(message);
+                }
+                catch (Exception e) {
+                    e("failed to save file to %s", logFile.getPath());
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
