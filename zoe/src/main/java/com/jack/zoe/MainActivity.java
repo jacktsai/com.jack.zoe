@@ -1,15 +1,12 @@
 package com.jack.zoe;
 
 import android.app.Activity;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,8 +22,6 @@ import java.util.TimerTask;
 
 public class MainActivity extends Activity {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
-
     private int[] picArray = new int[] { R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d, R.drawable.e, R.drawable.f, R.drawable.g, R.drawable.h, R.drawable.i, R.drawable.j };
     private int currentImageIndex = 0;
     private Timer imageScrollTimer;
@@ -36,9 +31,8 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "onCreate");
-        super.setTitle(R.string.main_title);
         super.onCreate(savedInstanceState);
+        super.setTitle(R.string.main_title);
         super.setContentView(R.layout.activity_main);
 
         this.messageAnimator = new MessageAnimation();
@@ -91,7 +85,6 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        Log.i(TAG, "onDestroy");
         this.stopBGM();
         this.messageAnimator.cancel();
         this.stopScrollImage();
@@ -190,7 +183,7 @@ public class MainActivity extends Activity {
 
         @Override
         public void run() {
-            MainActivity.this.runOnUiThread(runnable);
+            runOnUiThread(runnable);
         }
     }
 
@@ -201,30 +194,7 @@ public class MainActivity extends Activity {
             public android.widget.TextView TextView;
         }
 
-        class MessageRunnable implements Runnable {
-            final private char[] messageChars;
-            final private TextView textView;
-
-            private int displayedLength = 0;
-
-            public MessageRunnable(String message, TextView textView) {
-                this.messageChars = message.toCharArray();
-                this.textView = textView;
-            }
-
-            public boolean getFinished() {
-                return this.displayedLength == this.messageChars.length;
-            }
-
-            public void run() {
-                this.displayedLength = this.displayedLength + 1;
-                this.textView.setText(this.messageChars, 0, Math.min(this.messageChars.length, this.displayedLength));
-            }
-        }
-
         final private MessagePair[] messagePairs;
-
-        Timer timer;
 
         public MessageAnimation() {
             Resources resources = getResources();
@@ -259,6 +229,29 @@ public class MainActivity extends Activity {
 
             this.messagePairs = new MessagePair[] { greetings, message1, message2, message3, message4, message5, signature };
         }
+
+        class MessageRunnable implements Runnable {
+            final private char[] messageChars;
+            final private TextView textView;
+
+            private int displayedLength = 0;
+
+            public MessageRunnable(String message, TextView textView) {
+                this.messageChars = message.toCharArray();
+                this.textView = textView;
+            }
+
+            public boolean getFinished() {
+                return this.displayedLength == this.messageChars.length;
+            }
+
+            public void run() {
+                this.displayedLength = this.displayedLength + 1;
+                this.textView.setText(this.messageChars, 0, Math.min(this.messageChars.length, this.displayedLength));
+            }
+        }
+
+        Timer timer;
 
         public boolean getFinished() {
             return this.timer == null;
