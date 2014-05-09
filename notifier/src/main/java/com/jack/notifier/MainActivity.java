@@ -15,8 +15,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        super.setContentView(R.layout.activity_main);
-        super.setContentView(com.android.internal.R.layout.notification_template_base);
+        super.setContentView(R.layout.activity_main);
 
 //        Button createNotification = (Button)super.findViewById(R.id.createNotification);
 //        createNotification.setOnClickListener(new View.OnClickListener() {
