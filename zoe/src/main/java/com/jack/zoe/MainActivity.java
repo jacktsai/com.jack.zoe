@@ -10,6 +10,9 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +25,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends Activity {
 
-    private static String TAG = "Zoe";
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private int[] picArray = new int[] { R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d, R.drawable.e, R.drawable.f, R.drawable.g, R.drawable.h, R.drawable.i, R.drawable.j };
     private int currentImageIndex = 0;
@@ -33,11 +36,10 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i(TAG, "onCreate");
         super.setTitle(R.string.main_title);
         super.onCreate(savedInstanceState);
         super.setContentView(R.layout.activity_main);
-
-        //super.startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
 
         this.messageAnimator = new MessageAnimation();
         this.messageAnimator.start();
@@ -55,7 +57,6 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPageSelected(int position) {
-                Log.e(TAG, String.format("onPageSelected %d", position));
                 currentImageIndex = position;
                 stopScrollImage();
                 startScrollImage();
@@ -70,7 +71,27 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = super.getMenuInflater();
+        inflater.inflate(R.menu.main_activity_settings, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.nlSetting:
+                super.startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onDestroy() {
+        Log.i(TAG, "onDestroy");
         this.stopBGM();
         this.messageAnimator.cancel();
         this.stopScrollImage();
@@ -197,7 +218,7 @@ public class MainActivity extends Activity {
 
             public void run() {
                 this.displayedLength = this.displayedLength + 1;
-                this.textView.setText(this.messageChars, 0, this.displayedLength);
+                this.textView.setText(this.messageChars, 0, Math.min(this.messageChars.length, this.displayedLength));
             }
         }
 
@@ -292,30 +313,12 @@ public class MainActivity extends Activity {
 
             this.timer = new Timer();
             this.timer.schedule(task, 1000, 200);
-
-            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this);
-            builder.setContentTitle("My Notification");
-            builder.setContentText("start");
-            builder.setTicker("Notification Listener Service Example");
-            builder.setSmallIcon(R.drawable.ic_launcher);
-            builder.setAutoCancel(true);
-            manager.notify((int) System.currentTimeMillis(), builder.build());
         }
 
         public void cancel() {
             if (this.timer != null) {
                 this.timer.cancel();
                 this.timer = null;
-
-                NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this);
-                builder.setContentTitle("My Notification");
-                builder.setContentText("completed");
-                builder.setTicker("Notification Listener Service Example");
-                builder.setSmallIcon(R.drawable.ic_launcher);
-                builder.setAutoCancel(true);
-                manager.notify((int) System.currentTimeMillis(), builder.build());
             }
         }
 

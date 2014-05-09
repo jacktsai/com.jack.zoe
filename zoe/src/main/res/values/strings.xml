@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">筱柔專屬</string>
-    <string name="main_title">致筱柔2014年生日快樂</string>
+    <string name="app_name">給筱柔的祝福</string>
+    <string name="main_title">祝筱柔2014年生日快樂</string>
     <string name="greetings">Dear 筱柔</string>
     <string name="message1">這是我第一個在手機上寫的APP</string>
     <string name="message2">同時也是專屬於妳的生日禮物</string>

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/com.jack.zoe.iml" filepath="$PROJECT_DIR$/com.jack.zoe.iml" />
+      <module fileurl="file://$PROJECT_DIR$/notifier/notifier.iml" filepath="$PROJECT_DIR$/notifier/notifier.iml" />
       <module fileurl="file://$PROJECT_DIR$/zoe/zoe.iml" filepath="$PROJECT_DIR$/zoe/zoe.iml" />
     </modules>
   </component>
