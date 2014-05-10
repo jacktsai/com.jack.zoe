@@ -28,7 +28,6 @@ public class MainActivity extends Activity {
     private ViewPager imagePager;
     private MessageAnimation messageAnimator;
     private MediaPlayer mp3Player;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

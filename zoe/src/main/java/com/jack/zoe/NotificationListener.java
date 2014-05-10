@@ -55,6 +55,7 @@ public class NotificationListener extends NotificationListenerService {
         Notification n = sbn.getNotification();
 
         J.log("=== [%s] ===", eventName);
+        J.log("ID: 0x%x", sbn.getId());
         J.log("Package Name: %s", sbn.getPackageName());
         J.log("TickerText: %s", n.tickerText);
 
