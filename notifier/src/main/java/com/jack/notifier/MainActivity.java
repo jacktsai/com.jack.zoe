@@ -18,20 +18,17 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         super.setContentView(R.layout.activity_main);
 
-        Button createNotification = (Button)super.findViewById(R.id.createNotification);
-        createNotification.setOnClickListener(new View.OnClickListener() {
+        super.findViewById(R.id.createNotification1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Notification.Builder builder = new Notification.Builder(MainActivity.this);
-                builder.setContentTitle("ContentTitle");
-                builder.setContentText("ContentText");
-                builder.setContentInfo("ContentInfo");
-                builder.setSubText("SubText");
-                builder.setTicker("TickerText");
-                builder.setSmallIcon(R.drawable.ic_launcher);
+                createNotification((int)System.currentTimeMillis());
+            }
+        });
 
-                NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-                manager.notify((int)System.currentTimeMillis(), builder.build());
+        super.findViewById(R.id.createNotification2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createNotification(123456);
             }
         });
 
@@ -53,5 +50,18 @@ public class MainActivity extends Activity {
                 }
             }
         });
+    }
+
+    private void createNotification(int id) {
+        Notification.Builder builder = new Notification.Builder(MainActivity.this);
+        builder.setContentTitle("ContentTitle");
+        builder.setContentText("ContentText");
+        builder.setContentInfo("ContentInfo");
+        builder.setSubText("SubText");
+        builder.setTicker("TickerText");
+        builder.setSmallIcon(R.drawable.ic_launcher);
+
+        NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        manager.notify(id, builder.build());
     }
 }

@@ -1,4 +1,4 @@
-package com.jack.zoe;
+package com.jack.notifier;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,20 +6,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.jack.zoe.util.J;
-
-
 public class CoupleIntentActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        J.d("CoupleIntentActivity.onCreate <%s>", this);
         super.onCreate(savedInstanceState);
         super.setContentView(R.layout.activity_couple_intent);
 
         Intent intent = super.getIntent();
         String action = intent.getAction();
-        J.d("Intent action=%s", action);
 
         Button button1 = (Button)super.findViewById(R.id.button1);
         button1.setOnClickListener(new ButtonOnClickListener());
@@ -48,11 +43,5 @@ public class CoupleIntentActivity extends Activity {
                 startActivity(new Intent("com.jack.zoe.action1"));
             }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        J.d("CoupleIntentActivity.onDestroy <%s>", this);
-        super.onDestroy();
     }
 }

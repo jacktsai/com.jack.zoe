@@ -2,14 +2,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="${packageName}.${activityClass}">
-
+    tools:context="${packageName}.${activityClass}"
+    android:longClickable="false"
+    android:orientation="vertical">
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="建立通知"
-        android:id="@+id/createNotification" />
+        android:text="建立不同ID的通知"
+        android:id="@+id/createNotification1" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="建立同ID的通知"
+        android:id="@+id/createNotification2" />
 
     <Button
         android:layout_width="wrap_content"
