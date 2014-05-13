@@ -47,11 +47,11 @@ public class MadHeadTosObserver extends Service {
                 }
             }
 
-            private void notifyFloorWaveInformation(TosFile saveData) throws JSONException {
+            private void notifyFloorWaveInformation(TosFile tosFile) throws JSONException {
                 NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                 manager.cancel(7533967);
 
-                Iterable<TosFile.FloorWave> floorWaves = saveData.CURRENT_FLOOR_WAVES();
+                Iterable<TosFile.FloorWave> floorWaves = tosFile.CURRENT_FLOOR_WAVES();
                 if (floorWaves == null) {
                     return;
                 }
@@ -73,11 +73,12 @@ public class MadHeadTosObserver extends Service {
 
                 if (lootCount > 0) {
                     Notification notification = new Notification.Builder(context)
-                            .setTicker("神魔之塔獎勵公告")
+                            .setTicker("神魔之塔關卡獎勵公告")
                             .setSmallIcon(R.drawable.ic_launcher)
                             .setOngoing(true)
                             .build();
                     RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification_tos_loots);
+                    views.setTextViewText(R.id.loot_title, String.format("%s的關卡獎勵如下", tosFile.GAME_LOCAL_USER()));
                     views.setTextViewText(R.id.loot_desc, messageBuilder.toString());
                     notification.bigContentView = views;
 

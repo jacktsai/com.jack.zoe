@@ -9,14 +9,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="神魔之塔獎勵公告"
+        android:id="@+id/loot_title"
         android:layout_gravity="center_horizontal" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/loot_desc"
-        android:text="獎勵描述"/>
+        android:id="@+id/loot_desc" />
 
 </LinearLayout>

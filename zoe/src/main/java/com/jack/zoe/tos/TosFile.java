@@ -2,6 +2,7 @@ package com.jack.zoe.tos;
 
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,9 +65,7 @@ public class TosFile {
     private static void checkTosCardNames(Context context) {
         if (cardNames == null) {
             try {
-                AssetManager assetManager = context.getAssets();
-                InputStream tos_card_names = assetManager.open("tos_card_names.txt");
-                cardNames = new TosCardNames(tos_card_names);
+                cardNames = new TosCardNames(context);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -79,61 +78,109 @@ public class TosFile {
         this.cacheFile = cacheFile;
     }
 
-    public Iterable<FloorWave> CURRENT_FLOOR_WAVES() throws JSONException {
-        String rawString = this.getString("MH_CACHE_RUNTIME_DATA_CURRENT_FLOOR_WAVES");
-        if (rawString == null) {
-            return null;
+    public int GAME_LOCAL_USER() {
+        try {
+            return this.getInt("GAME_LOCAL_USER");
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
         }
 
-        int indexOfFirstBrace = rawString.indexOf("[");
-        if (indexOfFirstBrace < 0) {
-            return null;
-        }
-
-        String jsonString = rawString.substring(indexOfFirstBrace);
-        JSONArray waveArray = new JSONArray(jsonString);
-        List<FloorWave> result = new ArrayList<FloorWave>();
-        for (int i = 0; i < waveArray.length(); i++) {
-            JSONObject wave = (JSONObject)waveArray.get(i);
-            result.add(new FloorWave(wave));
-        }
-
-        return result;
+        return -1;
     }
 
-    private String getString(String name) {
+    public String GAME_UNIQUE_KEY() {
+        try {
+            return this.getString("GAME_UNIQUE_KEY");
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public Iterable<FloorWave> CURRENT_FLOOR_WAVES() {
+        try {
+            String rawString = this.getString("MH_CACHE_RUNTIME_DATA_CURRENT_FLOOR_WAVES");
+            if (rawString == null) {
+                return null;
+            }
+
+            int indexOfFirstBrace = rawString.indexOf("[");
+            if (indexOfFirstBrace < 0) {
+                return null;
+            }
+
+            String jsonString = rawString.substring(indexOfFirstBrace);
+            JSONArray waveArray = new JSONArray(jsonString);
+            List<FloorWave> result = new ArrayList<FloorWave>();
+            for (int i = 0; i < waveArray.length(); i++) {
+                JSONObject wave = (JSONObject) waveArray.get(i);
+                result.add(new FloorWave(wave));
+            }
+
+            return result;
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private String getString(String name) throws XmlPullParserException, IOException {
         XmlPullParserFactory parserFactory;
         XmlPullParser pullParser;
-        try {
-            parserFactory = XmlPullParserFactory.newInstance();
-            parserFactory.setNamespaceAware(true);
-            pullParser = parserFactory.newPullParser();
+        parserFactory = XmlPullParserFactory.newInstance();
+        parserFactory.setNamespaceAware(true);
+        pullParser = parserFactory.newPullParser();
 
-            FileReader fileReader = new FileReader(this.cacheFile.getPath());
-            pullParser.setInput(fileReader);
+        FileReader fileReader = new FileReader(this.cacheFile.getPath());
+        pullParser.setInput(fileReader);
 
-            int eventType = pullParser.getEventType();
+        int eventType = pullParser.getEventType();
 
-            while (eventType != XmlPullParser.END_DOCUMENT) {
+        while (eventType != XmlPullParser.END_DOCUMENT) {
 
-                if (eventType == XmlPullParser.START_TAG) {
-                    if (pullParser.getName().equals("string")) {
-                        if (pullParser.getAttributeValue(0).equals(name)) {
-                            eventType = pullParser.next();
-                            if (eventType == XmlPullParser.TEXT) {
-                                return pullParser.getText();
-                            }
+            if (eventType == XmlPullParser.START_TAG) {
+                if (pullParser.getName().equals("string")) {
+                    if (pullParser.getAttributeValue(0).equals(name)) {
+                        eventType = pullParser.next();
+                        if (eventType == XmlPullParser.TEXT) {
+                            return pullParser.getText();
                         }
                     }
                 }
-                eventType = pullParser.next();
             }
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            eventType = pullParser.next();
         }
+
         return null;
+    }
+
+    private int getInt(String name) throws XmlPullParserException, IOException {
+        XmlPullParserFactory parserFactory;
+        XmlPullParser pullParser;
+        parserFactory = XmlPullParserFactory.newInstance();
+        parserFactory.setNamespaceAware(true);
+        pullParser = parserFactory.newPullParser();
+
+        FileReader fileReader = new FileReader(this.cacheFile.getPath());
+        pullParser.setInput(fileReader);
+
+        int eventType = pullParser.getEventType();
+
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+
+            if (eventType == XmlPullParser.START_TAG) {
+                if (pullParser.getName().equals("int")) {
+                    if (pullParser.getAttributeValue(0).equals(name)) {
+                        return Integer.parseInt(pullParser.getAttributeValue(1));
+                    }
+                }
+            }
+            eventType = pullParser.next();
+        }
+
+        return -1;
     }
 
     public class FloorWave {
@@ -207,7 +254,7 @@ public class TosFile {
                     Card card = card();
                     int monsterId = card.monsterId();
                     String monsterName = cardNames.findNameByMonsterId(monsterId);
-                    return String.format("卡號[%d]%s", monsterId, monsterName);
+                    return String.format("卡號%d-%s", monsterId, monsterName);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
