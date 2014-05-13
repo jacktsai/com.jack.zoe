@@ -71,6 +71,6 @@ public class TosCardNames {
     }
 
     public String findNameByMonsterId(int monsterId) {
-        return cardNames.get(monsterId);
+        return cardNames.get(monsterId - 1);
     }
 }

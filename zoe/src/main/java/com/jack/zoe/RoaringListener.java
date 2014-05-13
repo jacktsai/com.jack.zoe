@@ -21,7 +21,7 @@ public class RoaringListener extends NotificationListenerService {
     @Override
     public void onCreate() {
         SharedPreferences preferences = this.getPreferences();
-        this.loadTargetPackageNames(preferences);
+        this.loadTargetPackageNamesOrDefaults(preferences);
 
         Context context = this.getApplicationContext();
         context.startService(new Intent(context, MadHeadTosObserver.class));
@@ -77,19 +77,30 @@ public class RoaringListener extends NotificationListenerService {
         return this.getSharedPreferences(this.getClass().getName(), Context.MODE_PRIVATE);
     }
 
-    private void loadTargetPackageNames(SharedPreferences preferences) {
+    private void loadTargetPackageNamesOrDefaults(SharedPreferences preferences) {
         this.notificationIdMap.clear();
         J.d("notificationIdMap cleared");
 
-        int count = preferences.getInt("packageNameCount", 0);
-        J.d("package name count is %d", count);
-
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; ; i++) {
             String packageName = preferences.getString("packageName" + i, null);
             if (packageName != null) {
                 this.notificationIdMap.put(packageName, new ArrayList<String>());
                 J.d("package name '%s' added", packageName);
+            } else {
+                if (i == 0) {
+                    this.setDefaults(preferences);
+                    this.loadTargetPackageNamesOrDefaults(preferences);
+                }
+
+                break;
             }
         }
+    }
+
+    private void setDefaults(SharedPreferences preferences) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("packageName0", "com.jack.notifier");
+        editor.putString("packageName1", "com.madhead.tos.zh");
+        editor.commit();
     }
 }

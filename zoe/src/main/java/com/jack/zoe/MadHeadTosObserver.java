@@ -13,12 +13,14 @@ import com.jack.zoe.util.J;
 
 import org.json.JSONException;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class MadHeadTosObserver extends Service {
 
     private static final String TAG = MadHeadTosObserver.class.getSimpleName();
+    private static final int NOTIFICATION_ID = 7533967;
 
     private Timer timer = new Timer();
 
@@ -37,10 +39,10 @@ public class MadHeadTosObserver extends Service {
             @Override
             public void run() {
                 if (TosFile.isChanged()) {
-                    TosFile saveData = TosFile.snapshot(context);
+                    TosFile tosFile = TosFile.snapshot(context);
 
                     try {
-                        this.notifyFloorWaveInformation(saveData);
+                        this.notifyFloorWaveInformation(tosFile);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -49,12 +51,14 @@ public class MadHeadTosObserver extends Service {
 
             private void notifyFloorWaveInformation(TosFile tosFile) throws JSONException {
                 NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-                manager.cancel(7533967);
+                manager.cancel(NOTIFICATION_ID);
 
                 Iterable<TosFile.FloorWave> floorWaves = tosFile.CURRENT_FLOOR_WAVES();
                 if (floorWaves == null) {
                     return;
                 }
+
+                List<Integer> collectedIds = tosFile.USER_COLLECTED_MONSTER_IDS();
 
                 StringBuilder messageBuilder = new StringBuilder();
                 int lootCount = 0;
@@ -65,7 +69,21 @@ public class MadHeadTosObserver extends Service {
                             if (lootCount > 0)
                                 messageBuilder.append("\n");
 
-                            messageBuilder.append(lootItem);
+                            String lootType = lootItem.type();
+
+                            if (lootType.equals("money")) {
+                                messageBuilder.append(String.format("金錢 %d", lootItem.amount()));
+                            } else if (lootType.equals("monster")) {
+                                TosFile.Card card = lootItem.card();
+                                messageBuilder.append(String.format("卡號%d-%s", card.monsterId(), card.monsterName()));
+
+                                if (collectedIds != null) {
+                                    if (!collectedIds.contains(card.monsterId())) {
+                                        messageBuilder.append("*NEW*");
+                                    }
+                                }
+                            }
+
                             lootCount++;
                         }
                     }
@@ -73,16 +91,16 @@ public class MadHeadTosObserver extends Service {
 
                 if (lootCount > 0) {
                     Notification notification = new Notification.Builder(context)
-                            .setTicker("神魔之塔關卡獎勵公告")
+                            .setTicker("神魔之塔關卡當前獎勵通知")
                             .setSmallIcon(R.drawable.ic_launcher)
                             .setOngoing(true)
                             .build();
                     RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification_tos_loots);
-                    views.setTextViewText(R.id.loot_title, String.format("%s的關卡獎勵如下", tosFile.GAME_LOCAL_USER()));
+                    views.setTextViewText(R.id.loot_title, String.format("%s的當前獎勵如下", tosFile.GAME_LOCAL_USER()));
                     views.setTextViewText(R.id.loot_desc, messageBuilder.toString());
                     notification.bigContentView = views;
 
-                    manager.notify(7533967, notification);
+                    manager.notify(NOTIFICATION_ID, notification);
                 }
             }
         };

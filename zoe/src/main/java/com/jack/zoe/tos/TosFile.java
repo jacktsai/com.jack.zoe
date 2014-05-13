@@ -22,6 +22,7 @@ import org.json.*;
 public class TosFile {
     private static final String TAG = TosFile.class.getSimpleName();
     private static final File TosFile = new File("/data/data/com.madhead.tos.zh/shared_prefs/com.madhead.tos.zh.xml");
+    private static final int SignatureLength = 32;
     private static long previousModified = 0;
 
     private static TosCardNames cardNames;
@@ -98,19 +99,32 @@ public class TosFile {
         return null;
     }
 
+    public List<Integer> USER_COLLECTED_MONSTER_IDS() {
+        try {
+            String idArrayString = this.getSignaturedString("MH_CACHE_RUNTIME_USER_COLLECTED_MONSTER_IDS");
+            if (idArrayString != null) {
+                List<Integer> result = new ArrayList<Integer>();
+                for (String idString : idArrayString.split(",")) {
+                    int id = Integer.parseInt(idString);
+                    result.add(id);
+                }
+
+                return result;
+            }
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        }
+
+        return null;
+    }
+
     public Iterable<FloorWave> CURRENT_FLOOR_WAVES() {
         try {
-            String rawString = this.getString("MH_CACHE_RUNTIME_DATA_CURRENT_FLOOR_WAVES");
-            if (rawString == null) {
+            String jsonString = this.getSignaturedString("MH_CACHE_RUNTIME_DATA_CURRENT_FLOOR_WAVES");
+            if (jsonString == null) {
                 return null;
             }
 
-            int indexOfFirstBrace = rawString.indexOf("[");
-            if (indexOfFirstBrace < 0) {
-                return null;
-            }
-
-            String jsonString = rawString.substring(indexOfFirstBrace);
             JSONArray waveArray = new JSONArray(jsonString);
             List<FloorWave> result = new ArrayList<FloorWave>();
             for (int i = 0; i < waveArray.length(); i++) {
@@ -154,6 +168,15 @@ public class TosFile {
         }
 
         return null;
+    }
+
+    private String getSignaturedString(String name) throws XmlPullParserException, IOException {
+        String rawString = this.getString(name);
+        if (rawString == null || rawString.length() <= SignatureLength) {
+            return null;
+        }
+
+        return rawString.substring(SignatureLength);
     }
 
     private int getInt(String name) throws XmlPullParserException, IOException {
@@ -240,28 +263,6 @@ public class TosFile {
         public Card card() throws JSONException {
             return new Card(json.getJSONObject("card"));
         }
-
-        @Override
-        public String toString() {
-            try {
-                String type = this.type();
-
-                if (type.equals("money")) {
-                    return String.format("金錢 %d", this.amount());
-                }
-
-                if (type.equals("monster")) {
-                    Card card = card();
-                    int monsterId = card.monsterId();
-                    String monsterName = cardNames.findNameByMonsterId(monsterId);
-                    return String.format("卡號%d-%s", monsterId, monsterName);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return super.toString();
-        }
     }
 
     public class Card {
@@ -273,6 +274,10 @@ public class TosFile {
 
         public int monsterId() throws JSONException {
             return json.getInt("monsterId");
+        }
+
+        public String monsterName() throws JSONException {
+            return cardNames.findNameByMonsterId(this.monsterId());
         }
     }
  }
