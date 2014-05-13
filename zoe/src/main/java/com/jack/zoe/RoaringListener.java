@@ -1,6 +1,7 @@
 package com.jack.zoe;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.service.notification.NotificationListenerService;
@@ -19,19 +20,21 @@ public class RoaringListener extends NotificationListenerService {
 
     @Override
     public void onCreate() {
-        this.writeDefaults();
-
         SharedPreferences preferences = this.getPreferences();
         this.loadTargetPackageNames(preferences);
 
-        preferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
-                loadTargetPackageNames(preferences);
-            }
-        });
+        Context context = this.getApplicationContext();
+        context.startService(new Intent(context, MadHeadTosObserver.class));
 
         super.onCreate();
+    }
+
+    @Override
+    public void onDestroy() {
+        Context context = this.getApplicationContext();
+        context.stopService(new Intent(context, MadHeadTosObserver.class));
+
+        super.onDestroy();
     }
 
     @Override
@@ -59,7 +62,7 @@ public class RoaringListener extends NotificationListenerService {
         J.d("Notification '%s' removed", sbn.getPackageName());
         List<String> idList = this.notificationIdMap.get(sbn.getPackageName());
 
-        if (!idList.isEmpty()) {
+        if (idList != null && !idList.isEmpty()) {
             String id = Integer.toString(sbn.getId());
 
             if (idList.remove(id) && idList.isEmpty()) {
@@ -88,14 +91,5 @@ public class RoaringListener extends NotificationListenerService {
                 J.d("package name '%s' added", packageName);
             }
         }
-    }
-
-    private void writeDefaults() {
-        SharedPreferences preferences = this.getPreferences();
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.clear();
-        editor.putInt("packageNameCount", 1);
-        editor.putString("packageName0", "com.jack.notifier");
-        editor.commit();
     }
 }

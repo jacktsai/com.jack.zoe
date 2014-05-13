@@ -1,29 +1,34 @@
 package com.jack.zoe.util;
 
-import android.app.Application;
-import android.content.ContextWrapper;
 import android.os.Environment;
-import android.service.notification.StatusBarNotification;
 import android.text.format.Time;
 import android.util.Log;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class J {
 
-    private static final String TAG = "JackZoe";
+    private static final String DEFAULT_TAG = "JackZoe";
 
     public static void d(String format, Object... args) {
         String message = String.format(format, args);
-        Log.d(TAG, message);
+        Log.d(DEFAULT_TAG, message);
+    }
+
+    public static void d2(String tag, String format, Object... args) {
+        String message = String.format(format, args);
+        Log.d(tag, message);
     }
 
     public static void e(String format, Object... args) {
         String message = String.format(format, args);
-        Log.e(TAG, message);
+        Log.e(DEFAULT_TAG, message);
+    }
+
+    public static void e2(String tag, String format, Object... args) {
+        String message = String.format(format, args);
+        Log.e(tag, message);
     }
 
     public static void printStackTrace() {
