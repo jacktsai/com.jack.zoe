@@ -71,7 +71,7 @@ public class MadHeadTosObserver extends Service {
             private void fillUser(TosFile tosFile, RemoteViews remoteViews) throws JSONException {
                 StringBuilder message = new StringBuilder();
                 message.append(String.format("UID %s\n", tosFile.GAME_LOCAL_USER()));
-                message.append(String.format("KEY %s\n", tosFile.GAME_UNIQUE_KEY()));
+                message.append(String.format("KEY %s", tosFile.GAME_UNIQUE_KEY()));
 
                 remoteViews.setTextViewText(R.id.user, message.toString());
             }
@@ -107,32 +107,32 @@ public class MadHeadTosObserver extends Service {
                         for (TosFile.FloorEnemy enemy : wave.enemies()) {
                             TosFile.LootItem lootItem = enemy.lootItem();
                             if (lootItem != null) {
-                                if (lootCount > 0)
-                                    messageBuilder.append("\n");
-
                                 String lootType = lootItem.type();
+                                if (lootType.equals("money") || lootType.equals("monster")) {
+                                    if (lootCount > 0) {
+                                        messageBuilder.append("\n");
+                                    }
 
-                                if (lootType.equals("money")) {
-                                    messageBuilder.append(String.format("金幣 %d", lootItem.amount()));
-                                } else if (lootType.equals("monster")) {
-                                    TosFile.Card card = lootItem.card();
-                                    messageBuilder.append(String.format("卡號%d-%s", card.monsterId(), card.monsterName()));
-
-                                    if (collectedIds != null) {
-                                        if (!collectedIds.contains(card.monsterId())) {
-                                            messageBuilder.append("*NEW*");
+                                    if (lootType.equals("money")) {
+                                        messageBuilder.append(String.format("金幣 %d", lootItem.amount()));
+                                    } else if (lootType.equals("monster")) {
+                                        TosFile.Card card = lootItem.card();
+                                        messageBuilder.append(String.format("[%s]%d星%s-%s", card.number(), card.rarity(), card.race(), card.name()));
+                                        if (collectedIds != null) {
+                                            if (!collectedIds.contains(card.id())) {
+                                                messageBuilder.append("*NEW*");
+                                            }
                                         }
                                     }
-                                }
 
-                                lootCount++;
+                                    lootCount++;
+                                }
                             }
                         }
                     }
 
                     if (lootCount > 0) {
                         remoteViews.setTextViewText(R.id.loot_desc, messageBuilder.toString());
-                        //remoteViews.setOnClickPendingIntent();
                     }
                 }
             }
