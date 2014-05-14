@@ -13,6 +13,7 @@ import com.jack.zoe.util.J;
 
 import org.json.JSONException;
 
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -20,7 +21,6 @@ import java.util.TimerTask;
 public class MadHeadTosObserver extends Service {
 
     private static final String TAG = MadHeadTosObserver.class.getSimpleName();
-    private static final int NOTIFICATION_ID = 7533967;
 
     private Timer timer = new Timer();
 
@@ -40,68 +40,102 @@ public class MadHeadTosObserver extends Service {
             public void run() {
                 if (TosFile.isChanged()) {
                     TosFile tosFile = TosFile.snapshot(context);
-
+                    NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+                    notificationManager.cancel(7533967);
                     try {
-                        this.notifyFloorWaveInformation(tosFile);
+                        Notification notification = this.createNotification(tosFile);
+                        notificationManager.notify(7533967, notification);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
             }
 
-            private void notifyFloorWaveInformation(TosFile tosFile) throws JSONException {
-                NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-                manager.cancel(NOTIFICATION_ID);
+            private Notification createNotification(TosFile tosFile) throws JSONException {
+                RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_tos);
 
-                Iterable<TosFile.FloorWave> floorWaves = tosFile.CURRENT_FLOOR_WAVES();
-                if (floorWaves == null) {
-                    return;
+//                this.fillUser(tosFile, remoteViews);
+                this.fillAlarm(tosFile, remoteViews);
+                this.fillLoots(tosFile, remoteViews);
+
+                Notification notification = new Notification.Builder(context)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setOngoing(true)
+                        .build();
+                notification.bigContentView = remoteViews;
+
+                return notification;
+            }
+
+            private void fillUser(TosFile tosFile, RemoteViews remoteViews) throws JSONException {
+                TosFile.User user = tosFile.USER();
+                StringBuilder message = new StringBuilder();
+                message.append(String.format("uid %s\n", user.uid));
+                message.append(String.format("uniqueKey %s\n", user.uniqueKey));
+//                    message.append(String.format("等級 %d\n", user.level));
+//                    message.append(String.format("魔法石 %d\n", user.diamond));
+//                    message.append(String.format("金幣 %d\n", user.coin));
+//                    message.append(String.format("session %s", user.session));
+
+//                remoteViews.setTextViewText(R.id.user, message.toString());
+            }
+
+            private void fillAlarm(TosFile tosFile, RemoteViews remoteViews) throws JSONException {
+                Iterable<TosFile.Alarm> alarms = tosFile.ALARM_SETTING();
+                int alarmCount = 0;
+                StringBuilder message = new StringBuilder();
+
+                if (alarms != null) {
+                    for (TosFile.Alarm alarm : alarms) {
+                        if (alarmCount > 0)
+                            message.append("\n");
+
+                        message.append(String.format("%s %s", alarm.J_C_TIMESTAMP().format("%m-%d %H:%M"), alarm.J_MESSAGE()));
+                        alarmCount++;
+                    }
                 }
 
-                List<Integer> collectedIds = tosFile.USER_COLLECTED_MONSTER_IDS();
+                remoteViews.setTextViewText(R.id.alarm_desc, message.toString());
+            }
 
+            private void fillLoots(TosFile tosFile, RemoteViews remoteViews) throws JSONException {
                 StringBuilder messageBuilder = new StringBuilder();
-                int lootCount = 0;
-                for (TosFile.FloorWave wave : floorWaves) {
-                    for (TosFile.FloorEnemy enemy : wave.enemies()) {
-                        TosFile.LootItem lootItem = enemy.lootItem();
-                        if (lootItem != null) {
-                            if (lootCount > 0)
-                                messageBuilder.append("\n");
 
-                            String lootType = lootItem.type();
+                String floor = tosFile.CURRENT_FLOOR();
+                if (floor != null && floor.length() > 0) {
+                    Iterable<TosFile.FloorWave> floorWaves = tosFile.CURRENT_FLOOR_WAVES();
+                    List<Integer> collectedIds = tosFile.USER_COLLECTED_MONSTER_IDS();
+                    int lootCount = 0;
 
-                            if (lootType.equals("money")) {
-                                messageBuilder.append(String.format("金錢 %d", lootItem.amount()));
-                            } else if (lootType.equals("monster")) {
-                                TosFile.Card card = lootItem.card();
-                                messageBuilder.append(String.format("卡號%d-%s", card.monsterId(), card.monsterName()));
+                    for (TosFile.FloorWave wave : floorWaves) {
+                        for (TosFile.FloorEnemy enemy : wave.enemies()) {
+                            TosFile.LootItem lootItem = enemy.lootItem();
+                            if (lootItem != null) {
+                                if (lootCount > 0)
+                                    messageBuilder.append("\n");
 
-                                if (collectedIds != null) {
-                                    if (!collectedIds.contains(card.monsterId())) {
-                                        messageBuilder.append("*NEW*");
+                                String lootType = lootItem.type();
+
+                                if (lootType.equals("money")) {
+                                    messageBuilder.append(String.format("金幣 %d", lootItem.amount()));
+                                } else if (lootType.equals("monster")) {
+                                    TosFile.Card card = lootItem.card();
+                                    messageBuilder.append(String.format("卡號%d-%s", card.monsterId(), card.monsterName()));
+
+                                    if (collectedIds != null) {
+                                        if (!collectedIds.contains(card.monsterId())) {
+                                            messageBuilder.append("*NEW*");
+                                        }
                                     }
                                 }
-                            }
 
-                            lootCount++;
+                                lootCount++;
+                            }
                         }
                     }
                 }
 
-                if (lootCount > 0) {
-                    Notification notification = new Notification.Builder(context)
-                            .setTicker("神魔之塔關卡當前獎勵通知")
-                            .setSmallIcon(R.drawable.ic_launcher)
-                            .setOngoing(true)
-                            .build();
-                    RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification_tos_loots);
-                    views.setTextViewText(R.id.loot_title, String.format("%s的當前獎勵如下", tosFile.GAME_LOCAL_USER()));
-                    views.setTextViewText(R.id.loot_desc, messageBuilder.toString());
-                    notification.bigContentView = views;
-
-                    manager.notify(NOTIFICATION_ID, notification);
-                }
+                remoteViews.setTextViewText(R.id.loot_desc, messageBuilder.toString());
             }
         };
 

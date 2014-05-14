@@ -7,10 +7,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.text.format.Time;
 
 import com.jack.zoe.util.J;
 
@@ -101,7 +104,7 @@ public class TosFile {
 
     public List<Integer> USER_COLLECTED_MONSTER_IDS() {
         try {
-            String idArrayString = this.getSignaturedString("MH_CACHE_RUNTIME_USER_COLLECTED_MONSTER_IDS");
+            String idArrayString = this.getSignedString("MH_CACHE_RUNTIME_USER_COLLECTED_MONSTER_IDS");
             if (idArrayString != null) {
                 List<Integer> result = new ArrayList<Integer>();
                 for (String idString : idArrayString.split(",")) {
@@ -118,9 +121,61 @@ public class TosFile {
         return null;
     }
 
+    public User USER() {
+        try {
+            String source = this.getString("GAME_USER_JSON");
+            if (source == null) {
+                return null;
+            }
+
+            return new User(source);
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public Iterable<Alarm> ALARM_SETTING() {
+        try {
+            String jsonString = this.getString("SP_ALARM_SETTING");
+            if (jsonString == null) {
+                return null;
+            }
+
+            jsonString = jsonString
+                    .replace("\"{", "{")
+                    .replace("}\"", "}")
+                    .replace("\\\"", "\"");
+
+            JSONArray alarmArray = new JSONArray(jsonString);
+            List<Alarm> result = new ArrayList<Alarm>();
+            for (int i = 0; i < alarmArray.length(); i++) {
+                JSONObject alarm = (JSONObject)alarmArray.get(i);
+                result.add(new Alarm(alarm));
+            }
+
+            return result;
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public String CURRENT_FLOOR() {
+        try {
+            return this.getString("MH_CACHE_RUNTIME_DATA_CURRENT_FLOOR");
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        }
+
+        return null;
+    }
+
     public Iterable<FloorWave> CURRENT_FLOOR_WAVES() {
         try {
-            String jsonString = this.getSignaturedString("MH_CACHE_RUNTIME_DATA_CURRENT_FLOOR_WAVES");
+            String jsonString = this.getSignedString("MH_CACHE_RUNTIME_DATA_CURRENT_FLOOR_WAVES");
             if (jsonString == null) {
                 return null;
             }
@@ -148,29 +203,31 @@ public class TosFile {
         pullParser = parserFactory.newPullParser();
 
         FileReader fileReader = new FileReader(this.cacheFile.getPath());
-        pullParser.setInput(fileReader);
-
-        int eventType = pullParser.getEventType();
-
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-
-            if (eventType == XmlPullParser.START_TAG) {
-                if (pullParser.getName().equals("string")) {
-                    if (pullParser.getAttributeValue(0).equals(name)) {
-                        eventType = pullParser.next();
-                        if (eventType == XmlPullParser.TEXT) {
-                            return pullParser.getText();
+        try {
+            pullParser.setInput(fileReader);
+            int eventType = pullParser.getEventType();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                if (eventType == XmlPullParser.START_TAG) {
+                    if (pullParser.getName().equals("string")) {
+                        if (pullParser.getAttributeValue(0).equals(name)) {
+                            eventType = pullParser.next();
+                            if (eventType == XmlPullParser.TEXT) {
+                                return pullParser.getText();
+                            }
                         }
                     }
                 }
+                eventType = pullParser.next();
             }
-            eventType = pullParser.next();
+        }
+        finally {
+            fileReader.close();
         }
 
         return null;
     }
 
-    private String getSignaturedString(String name) throws XmlPullParserException, IOException {
+    private String getSignedString(String name) throws XmlPullParserException, IOException {
         String rawString = this.getString(name);
         if (rawString == null || rawString.length() <= SignatureLength) {
             return null;
@@ -187,23 +244,79 @@ public class TosFile {
         pullParser = parserFactory.newPullParser();
 
         FileReader fileReader = new FileReader(this.cacheFile.getPath());
-        pullParser.setInput(fileReader);
-
-        int eventType = pullParser.getEventType();
-
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-
-            if (eventType == XmlPullParser.START_TAG) {
-                if (pullParser.getName().equals("int")) {
-                    if (pullParser.getAttributeValue(0).equals(name)) {
-                        return Integer.parseInt(pullParser.getAttributeValue(1));
+        try {
+            pullParser.setInput(fileReader);
+            int eventType = pullParser.getEventType();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                if (eventType == XmlPullParser.START_TAG) {
+                    if (pullParser.getName().equals("int")) {
+                        if (pullParser.getAttributeValue(0).equals(name)) {
+                            return Integer.parseInt(pullParser.getAttributeValue(1));
+                        }
                     }
                 }
+                eventType = pullParser.next();
             }
-            eventType = pullParser.next();
+        } finally {
+            fileReader.close();
         }
 
         return -1;
+    }
+
+    public class User {
+        public String uid;
+        public String uniqueKey;
+        public int level;
+        public int diamond;
+        public int coin;
+        public String session;
+
+        public User(String source) {
+
+            for (String pair : source.split(";")) {
+                String[] blocks = pair.split("=");
+                String key = blocks[0];
+                String value = blocks[1];
+
+                if (key.equals("uid")) {
+                    uid = value;
+                } else if (key.equals("uniqueKey")) {
+                    uniqueKey = value;
+                } else if (key.equals("level")) {
+                    level = Integer.parseInt(value);
+                } else if (key.equals("diamond")) {
+                    diamond = Integer.parseInt(value);
+                } else if (key.equals("coin")) {
+                    coin = Integer.parseInt(value);
+                } else if (key.equals("session")) {
+                    session = value;
+                }
+            }
+        }
+    }
+
+    public class Alarm {
+        private final JSONObject json;
+
+        Alarm(JSONObject json) {
+            this.json = json;
+        }
+
+        public int J_NOTIFICATION_ID() throws JSONException {
+            return json.getInt("J_NOTIFICATION_ID");
+        }
+
+        public Time J_C_TIMESTAMP() throws JSONException {
+            Time time = new Time();
+            time.set(json.getLong("J_C_TIMESTAMP"));
+
+            return time;
+        }
+
+        public String J_MESSAGE() throws JSONException {
+            return json.getString("J_MESSAGE");
+        }
     }
 
     public class FloorWave {
