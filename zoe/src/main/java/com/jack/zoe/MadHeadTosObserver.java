@@ -13,7 +13,6 @@ import com.jack.zoe.util.J;
 
 import org.json.JSONException;
 
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -40,13 +39,15 @@ public class MadHeadTosObserver extends Service {
             public void run() {
                 if (TosFile.isChanged()) {
                     TosFile tosFile = TosFile.snapshot(context);
-                    NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-                    notificationManager.cancel(7533967);
-                    try {
-                        Notification notification = this.createNotification(tosFile);
-                        notificationManager.notify(7533967, notification);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    if (tosFile != null) {
+                        NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+                        notificationManager.cancel(7533967);
+                        try {
+                            Notification notification = this.createNotification(tosFile);
+                            notificationManager.notify(7533967, notification);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -54,7 +55,7 @@ public class MadHeadTosObserver extends Service {
             private Notification createNotification(TosFile tosFile) throws JSONException {
                 RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_tos);
 
-//                this.fillUser(tosFile, remoteViews);
+                this.fillUser(tosFile, remoteViews);
                 this.fillAlarm(tosFile, remoteViews);
                 this.fillLoots(tosFile, remoteViews);
 
@@ -68,16 +69,11 @@ public class MadHeadTosObserver extends Service {
             }
 
             private void fillUser(TosFile tosFile, RemoteViews remoteViews) throws JSONException {
-                TosFile.User user = tosFile.USER();
                 StringBuilder message = new StringBuilder();
-                message.append(String.format("uid %s\n", user.uid));
-                message.append(String.format("uniqueKey %s\n", user.uniqueKey));
-//                    message.append(String.format("等級 %d\n", user.level));
-//                    message.append(String.format("魔法石 %d\n", user.diamond));
-//                    message.append(String.format("金幣 %d\n", user.coin));
-//                    message.append(String.format("session %s", user.session));
+                message.append(String.format("UID %s\n", tosFile.GAME_LOCAL_USER()));
+                message.append(String.format("KEY %s\n", tosFile.GAME_UNIQUE_KEY()));
 
-//                remoteViews.setTextViewText(R.id.user, message.toString());
+                remoteViews.setTextViewText(R.id.user, message.toString());
             }
 
             private void fillAlarm(TosFile tosFile, RemoteViews remoteViews) throws JSONException {
@@ -133,13 +129,16 @@ public class MadHeadTosObserver extends Service {
                             }
                         }
                     }
-                }
 
-                remoteViews.setTextViewText(R.id.loot_desc, messageBuilder.toString());
+                    if (lootCount > 0) {
+                        remoteViews.setTextViewText(R.id.loot_desc, messageBuilder.toString());
+                        //remoteViews.setOnClickPendingIntent();
+                    }
+                }
             }
         };
 
-        timer.schedule(observerTask, 1000, 5000);
+        timer.schedule(observerTask, 1000, 15000);
 
         super.onCreate();
     }

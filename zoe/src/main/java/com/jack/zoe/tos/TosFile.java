@@ -1,69 +1,56 @@
 package com.jack.zoe.tos;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
-
 import android.content.Context;
-import android.content.res.AssetManager;
+import android.content.SharedPreferences;
 import android.text.format.Time;
 
-import com.jack.zoe.util.J;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-import org.json.*;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TosFile {
     private static final String TAG = TosFile.class.getSimpleName();
-    private static final File TosFile = new File("/data/data/com.madhead.tos.zh/shared_prefs/com.madhead.tos.zh.xml");
-    private static final int SignatureLength = 32;
+    private static final File SourceFile = new File("/data/data/com.madhead.tos.zh/shared_prefs/com.madhead.tos.zh.xml");
+    private static final int SIGNATURE_LENGTH = 32;
     private static long previousModified = 0;
 
     private static TosCardNames cardNames;
 
     public static boolean isChanged() {
-        long lastModified = TosFile.lastModified();
-
-        if (previousModified != lastModified) {
-            J.d2(TAG, "TosFile '%s' changed", TosFile.getPath());
-            previousModified = lastModified;
-            return true;
+        if (SourceFile.exists()) {
+            long lastModified = SourceFile.lastModified();
+            if (previousModified != lastModified) {
+                previousModified = lastModified;
+                return true;
+            }
         }
 
         return false;
     }
 
     public static TosFile snapshot(Context context) {
-        File cacheDir = context.getCacheDir();
-        File cacheFile = new File(cacheDir, "com.madhead.tos.zh.xml");
-
         try {
             Process process = Runtime.getRuntime().exec("su");
             DataOutputStream outputStream = new DataOutputStream(process.getOutputStream());
-            outputStream.writeBytes(String.format("cp %s %s\n", TosFile.getPath(), cacheFile.getPath()));
-            outputStream.writeBytes(String.format("chmod 777 %s\n", cacheFile.getPath()));
+            outputStream.writeBytes(String.format("chmod 777 %s\n", SourceFile));
             outputStream.writeBytes("exit\n");
             outputStream.flush();
             process.waitFor();
 
-            if (process.exitValue() != 255) {
-                checkTosCardNames(context);
-                return new TosFile(cacheFile);
-            }
+            checkTosCardNames(context);
+            SharedPreferences preferences = createSharedPreferences(SourceFile, Context.MODE_PRIVATE);
+            return new TosFile(preferences);
         } catch (Exception ignored) {
             ignored.printStackTrace();
+            return null;
         }
-
-        return null;
     }
 
     private static void checkTosCardNames(Context context) {
@@ -76,109 +63,86 @@ public class TosFile {
         }
     }
 
-    private final File cacheFile;
+    private static SharedPreferences createSharedPreferences(File file, int mode) {
+        try {
+            Class<?> implClass = Class.forName("android.app.SharedPreferencesImpl");
+            Constructor<?> constructor = implClass.getDeclaredConstructor(File.class, int.class);
+            return  (SharedPreferences)constructor.newInstance(file, mode);
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+            return null;
+        }
+    }
 
-    protected TosFile(File cacheFile) {
-        this.cacheFile = cacheFile;
+    private final SharedPreferences preferences;
+
+    protected TosFile(SharedPreferences preferences) {
+        this.preferences = preferences;
+
     }
 
     public int GAME_LOCAL_USER() {
-        try {
-            return this.getInt("GAME_LOCAL_USER");
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
-        }
-
-        return -1;
+        return this.preferences.getInt("GAME_LOCAL_USER", -1);
     }
 
     public String GAME_UNIQUE_KEY() {
-        try {
-            return this.getString("GAME_UNIQUE_KEY");
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
-        }
-
-        return null;
+        return this.preferences.getString("GAME_UNIQUE_KEY", null);
     }
 
     public List<Integer> USER_COLLECTED_MONSTER_IDS() {
-        try {
-            String idArrayString = this.getSignedString("MH_CACHE_RUNTIME_USER_COLLECTED_MONSTER_IDS");
-            if (idArrayString != null) {
-                List<Integer> result = new ArrayList<Integer>();
-                for (String idString : idArrayString.split(",")) {
-                    int id = Integer.parseInt(idString);
-                    result.add(id);
-                }
+        String idArrayString = this.preferences.getString("MH_CACHE_RUNTIME_USER_COLLECTED_MONSTER_IDS", null)
+            .substring(SIGNATURE_LENGTH);
 
-                return result;
-            }
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
+        List<Integer> result = new ArrayList<Integer>();
+        for (String idString : idArrayString.split(",")) {
+            int id = Integer.parseInt(idString);
+            result.add(id);
         }
 
-        return null;
+        return result;
     }
 
     public User USER() {
-        try {
-            String source = this.getString("GAME_USER_JSON");
-            if (source == null) {
-                return null;
-            }
-
-            return new User(source);
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
-        }
-
-        return null;
+        String source = this.preferences.getString("GAME_USER_JSON", null);
+        return new User(source);
     }
 
     public Iterable<Alarm> ALARM_SETTING() {
-        try {
-            String jsonString = this.getString("SP_ALARM_SETTING");
-            if (jsonString == null) {
-                return null;
-            }
+        String jsonString = this.preferences.getString("SP_ALARM_SETTING", null);
 
+        if (jsonString != null) {
             jsonString = jsonString
                     .replace("\"{", "{")
                     .replace("}\"", "}")
                     .replace("\\\"", "\"");
 
-            JSONArray alarmArray = new JSONArray(jsonString);
-            List<Alarm> result = new ArrayList<Alarm>();
-            for (int i = 0; i < alarmArray.length(); i++) {
-                JSONObject alarm = (JSONObject)alarmArray.get(i);
-                result.add(new Alarm(alarm));
-            }
+            try {
+                JSONArray alarmArray = new JSONArray(jsonString);
+                List<Alarm> result = new ArrayList<Alarm>();
+                for (int i = 0; i < alarmArray.length(); i++) {
+                    JSONObject alarm = (JSONObject) alarmArray.get(i);
+                    result.add(new Alarm(alarm));
+                }
 
-            return result;
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
+                return result;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
 
         return null;
     }
 
     public String CURRENT_FLOOR() {
-        try {
-            return this.getString("MH_CACHE_RUNTIME_DATA_CURRENT_FLOOR");
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
-        }
-
-        return null;
+        return this.preferences.getString("MH_CACHE_RUNTIME_DATA_CURRENT_FLOOR", null);
     }
 
     public Iterable<FloorWave> CURRENT_FLOOR_WAVES() {
+        String jsonString = this.preferences.getString("MH_CACHE_RUNTIME_DATA_CURRENT_FLOOR_WAVES", null)
+            .substring(SIGNATURE_LENGTH);
+
         try {
-            String jsonString = this.getSignedString("MH_CACHE_RUNTIME_DATA_CURRENT_FLOOR_WAVES");
-            if (jsonString == null) {
-                return null;
-            }
 
             JSONArray waveArray = new JSONArray(jsonString);
             List<FloorWave> result = new ArrayList<FloorWave>();
@@ -193,75 +157,6 @@ public class TosFile {
         }
 
         return null;
-    }
-
-    private String getString(String name) throws XmlPullParserException, IOException {
-        XmlPullParserFactory parserFactory;
-        XmlPullParser pullParser;
-        parserFactory = XmlPullParserFactory.newInstance();
-        parserFactory.setNamespaceAware(true);
-        pullParser = parserFactory.newPullParser();
-
-        FileReader fileReader = new FileReader(this.cacheFile.getPath());
-        try {
-            pullParser.setInput(fileReader);
-            int eventType = pullParser.getEventType();
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                if (eventType == XmlPullParser.START_TAG) {
-                    if (pullParser.getName().equals("string")) {
-                        if (pullParser.getAttributeValue(0).equals(name)) {
-                            eventType = pullParser.next();
-                            if (eventType == XmlPullParser.TEXT) {
-                                return pullParser.getText();
-                            }
-                        }
-                    }
-                }
-                eventType = pullParser.next();
-            }
-        }
-        finally {
-            fileReader.close();
-        }
-
-        return null;
-    }
-
-    private String getSignedString(String name) throws XmlPullParserException, IOException {
-        String rawString = this.getString(name);
-        if (rawString == null || rawString.length() <= SignatureLength) {
-            return null;
-        }
-
-        return rawString.substring(SignatureLength);
-    }
-
-    private int getInt(String name) throws XmlPullParserException, IOException {
-        XmlPullParserFactory parserFactory;
-        XmlPullParser pullParser;
-        parserFactory = XmlPullParserFactory.newInstance();
-        parserFactory.setNamespaceAware(true);
-        pullParser = parserFactory.newPullParser();
-
-        FileReader fileReader = new FileReader(this.cacheFile.getPath());
-        try {
-            pullParser.setInput(fileReader);
-            int eventType = pullParser.getEventType();
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                if (eventType == XmlPullParser.START_TAG) {
-                    if (pullParser.getName().equals("int")) {
-                        if (pullParser.getAttributeValue(0).equals(name)) {
-                            return Integer.parseInt(pullParser.getAttributeValue(1));
-                        }
-                    }
-                }
-                eventType = pullParser.next();
-            }
-        } finally {
-            fileReader.close();
-        }
-
-        return -1;
     }
 
     public class User {
