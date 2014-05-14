@@ -1,24 +1,15 @@
 package com.jack.zoe.tos;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.jack.zoe.util.J;
-
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
 
 public class TosCardNames {
     private static final String TAG = TosCardNames.class.getSimpleName();
@@ -64,6 +55,27 @@ public class TosCardNames {
             return cardMap;
         }
 
+        public Card findById(int monsterId) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT Number, CardName, Rarity, Race FROM App_Game001_Custom WHERE _id = ?", new String[] {Integer.toString(monsterId)});
+
+            try {
+                if (cursor.moveToFirst()) {
+                    Card result = new Card();
+                    result.number = cursor.getString(0);
+                    result.name = cursor.getString(1);
+                    result.rarity = cursor.getInt(2);
+                    result.race = cursor.getString(3);
+                    return result;
+                }
+            } finally {
+                cursor.close();
+                db.close();
+            }
+
+            return null;
+        }
+
         private void copyDatabase(Context context) {
             try {
                 InputStream input = context.getAssets().open(NAME);
@@ -84,33 +96,20 @@ public class TosCardNames {
         }
     }
 
-    private final List<String> cardNames = new ArrayList<String>();
+    private DbHelper db;
 
-    public TosCardNames(Context context) throws IOException {
-        this.loadCardsFromTextFile(context);
-        this.loadCardsFromDatabase(context);
+    public TosCardNames(Context context) {
+        this.db = new DbHelper(context);
     }
 
-    public String findNameByMonsterId(int monsterId) {
-        return cardNames.get(monsterId - 1);
+    public Card findNameByMonsterId(int monsterId) {
+        return db.findById(monsterId);
     }
 
-    private void loadCardsFromTextFile(Context context) throws IOException {
-        AssetManager assetManager = context.getAssets();
-        InputStream tos_card_names = assetManager.open("tos_card_names.txt");
-        InputStreamReader inputStreamReader = new InputStreamReader(tos_card_names);
-        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            cardNames.add(line);
-        }
-
-        inputStreamReader.close();
-    }
-
-    private void loadCardsFromDatabase(Context context) {
-        DbHelper helper = new DbHelper(context);
-        helper.getCardMap();
+    public class Card {
+        public String number;
+        public String name;
+        public int rarity;
+        public String race;
     }
 }

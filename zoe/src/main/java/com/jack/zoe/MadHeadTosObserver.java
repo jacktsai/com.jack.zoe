@@ -55,7 +55,6 @@ public class MadHeadTosObserver extends Service {
             private Notification createNotification(TosFile tosFile) throws JSONException {
                 RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_tos);
 
-                this.fillUser(tosFile, remoteViews);
                 this.fillAlarm(tosFile, remoteViews);
                 this.fillLoots(tosFile, remoteViews);
 
@@ -66,14 +65,6 @@ public class MadHeadTosObserver extends Service {
                 notification.bigContentView = remoteViews;
 
                 return notification;
-            }
-
-            private void fillUser(TosFile tosFile, RemoteViews remoteViews) throws JSONException {
-                StringBuilder message = new StringBuilder();
-                message.append(String.format("UID %s\n", tosFile.GAME_LOCAL_USER()));
-                message.append(String.format("KEY %s", tosFile.GAME_UNIQUE_KEY()));
-
-                remoteViews.setTextViewText(R.id.user, message.toString());
             }
 
             private void fillAlarm(TosFile tosFile, RemoteViews remoteViews) throws JSONException {

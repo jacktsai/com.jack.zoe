@@ -55,11 +55,7 @@ public class TosFile {
 
     private static void checkTosCardNames(Context context) {
         if (cardNames == null) {
-            try {
-                cardNames = new TosCardNames(context);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            cardNames = new TosCardNames(context);
         }
     }
 
@@ -274,18 +270,31 @@ public class TosFile {
     }
 
     public class Card {
-        private final JSONObject json;
+        private final int id;
+        private final TosCardNames.Card card;
 
-        Card(JSONObject json) {
-            this.json = json;
+        Card(JSONObject json) throws JSONException {
+            this.id = json.getInt("monsterId");
+            this.card = cardNames.findNameByMonsterId(this.id);
         }
 
-        public int monsterId() throws JSONException {
-            return json.getInt("monsterId");
+        public int id() {
+            return this.id;
+        }
+        public String number() {
+            return this.card.number;
         }
 
-        public String monsterName() throws JSONException {
-            return cardNames.findNameByMonsterId(this.monsterId());
+        public String name() {
+            return this.card.name;
+        }
+
+        public int rarity() {
+            return this.card.rarity;
+        }
+
+        public String race() {
+            return this.card.race;
         }
     }
  }
