@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     tools:context="${packageName}.${activityClass}"
     android:longClickable="false"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:weightSum="1">
 
     <Button
         android:layout_width="wrap_content"
@@ -23,5 +24,10 @@
         android:layout_height="wrap_content"
         android:text="撥放警告"
         android:id="@+id/playAlarm" />
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/volume" />
 
 </LinearLayout>

@@ -3,15 +3,25 @@ package com.jack.notifier;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
+
+import java.io.IOException;
 
 public class MainActivity extends Activity {
+    private MediaPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,24 +42,46 @@ public class MainActivity extends Activity {
             }
         });
 
-        final Button playAlarm = (Button)super.findViewById(R.id.playAlarm);
-        playAlarm.setOnClickListener(new View.OnClickListener() {
-            private MediaPlayer player;
-
+        this.findViewById(R.id.playAlarm).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (player == null) {
-                    player = MediaPlayer.create(MainActivity.this, R.raw.alarm);
-                    player.setVolume(1, 1);
-                    player.setLooping(true);
-                    player.start();
+                    startPlayAlarm();
                 } else {
-                    player.stop();
-                    player.release();
-                    player = null;
+                    stopPlayAlarm();
                 }
             }
         });
+
+        SeekBar volume = (SeekBar)this.findViewById(R.id.volume);
+        volume.setMax(10);
+        volume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Log.d("", String.format("progress = %d", progress));
+                if (player != null) {
+                    float v = (float) progress / 10;
+                    Log.d("", String.format("v = %f", v));
+                    player.setVolume(v, v);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
     }
 
     private void createNotification(int id) {
@@ -63,5 +95,19 @@ public class MainActivity extends Activity {
 
         NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         manager.notify(id, builder.build());
+    }
+
+    private void startPlayAlarm() {
+        Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        player = MediaPlayer.create(MainActivity.this, alert);
+        player.setVolume(0.1f, 0.1f);
+        player.setLooping(true);
+        player.start();
+    }
+
+    private void stopPlayAlarm() {
+        player.stop();
+        player.release();
+        player = null;
     }
 }
