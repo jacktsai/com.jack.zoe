@@ -18,15 +18,12 @@ import java.util.List;
 
 public class RoaringListener extends NotificationListenerService {
 
-    private boolean enabled;
-    private Uri ringtone;
-    private Hashtable<String, List<String>> notificationIdMap = new Hashtable<String, List<String>>();
+    private RoaringPreferences preferences;
     private MediaPlayer mediaPlayer;
 
     @Override
     public void onCreate() {
-        SharedPreferences preferences = this.getPreferences();
-        this.loadPreferences(preferences);
+        this.preferences = RoaringPreferences.createInstance(this);
 
         Context context = this.getApplicationContext();
         context.startService(new Intent(context, MadHeadTosObserver.class));
@@ -39,6 +36,8 @@ public class RoaringListener extends NotificationListenerService {
         Context context = this.getApplicationContext();
         context.stopService(new Intent(context, MadHeadTosObserver.class));
 
+        this.preferences.save();
+
         super.onDestroy();
     }
 
@@ -46,12 +45,12 @@ public class RoaringListener extends NotificationListenerService {
     public void onNotificationPosted(StatusBarNotification sbn) {
         J.d("Notification '%s' posted", sbn.getPackageName());
 
-        if (this.enabled) {
-            List<String> idList = this.notificationIdMap.get(sbn.getPackageName());
+        if (preferences.enabled) {
+            List<String> idList = preferences.notificationIdMap.get(sbn.getPackageName());
 
             if (idList != null) {
                 if (idList.isEmpty()) {
-                    mediaPlayer = MediaPlayer.create(super.getApplicationContext(), this.ringtone);
+                    mediaPlayer = MediaPlayer.create(super.getApplicationContext(), preferences.ringtone);
                     mediaPlayer.setVolume(1, 1);
                     mediaPlayer.setLooping(true);
                     mediaPlayer.start();
@@ -69,8 +68,8 @@ public class RoaringListener extends NotificationListenerService {
     public void onNotificationRemoved(StatusBarNotification sbn) {
         J.d("Notification '%s' removed", sbn.getPackageName());
 
-        if (this.enabled) {
-            List<String> idList = this.notificationIdMap.get(sbn.getPackageName());
+        if (preferences.enabled) {
+            List<String> idList = preferences.notificationIdMap.get(sbn.getPackageName());
 
             if (idList != null && !idList.isEmpty()) {
                 String id = Integer.toString(sbn.getId());
@@ -80,32 +79,6 @@ public class RoaringListener extends NotificationListenerService {
                     mediaPlayer.release();
                     mediaPlayer = null;
                 }
-            }
-        }
-    }
-
-    private SharedPreferences getPreferences() {
-        return this.getSharedPreferences(this.getClass().getName(), Context.MODE_PRIVATE);
-    }
-
-    private void loadPreferences(SharedPreferences preferences) {
-        this.enabled = preferences.getBoolean("enabled", true);
-        this.ringtone = Uri.parse(preferences.getString("ringtone", RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString()));
-
-        this.notificationIdMap.clear();
-        J.d("notificationIdMap cleared");
-        for (int i = 0; ; i++) {
-            String packageName = preferences.getString("packageName" + i, null);
-            if (packageName != null) {
-                this.notificationIdMap.put(packageName, new ArrayList<String>());
-                J.d("package name '%s' added", packageName);
-            } else {
-                if (i == 0) {
-                    this.notificationIdMap.put("com.jack.notifier", new ArrayList<String>());
-                    this.notificationIdMap.put("com.madhead.tos.zh", new ArrayList<String>());
-                }
-
-                break;
             }
         }
     }
