@@ -1,78 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:background="@android:color/black">
 
-    <TableRow
+    <ImageView android:id="@+id/icon"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_launcher"
+        android:background="@android:color/background_light"
+        android:scaleType="center"/>
+
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="74dp">
 
         <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="神魔之塔"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_marginTop="10dp"
+            android:text="神魔之塔"/>
 
-    </TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_column="2">
-
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_marginTop="10dp"
+            android:id="@+id/alarm_desc" />
 
-            <TextView
-                android:id="@+id/alarm_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="提醒"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <TextView
-                android:id="@+id/alarm_desc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="提醒內容"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        </LinearLayout>
-
-    </TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_column="2">
-
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_marginTop="10dp"
+            android:id="@+id/loot_desc" />
 
-            <TextView
-                android:id="@+id/loot_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="當前獎勵如下"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <TextView
-                android:id="@+id/loot_desc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="獎勵內容"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        </LinearLayout>
-
-    </TableRow>
-
-</TableLayout>
+    </LinearLayout>
+</FrameLayout>

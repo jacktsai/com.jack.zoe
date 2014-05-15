@@ -10,6 +10,12 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="設定通知存取權限"
+        android:id="@+id/setupNLS" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="建立不同ID的通知"
         android:id="@+id/createNotification1" />
 

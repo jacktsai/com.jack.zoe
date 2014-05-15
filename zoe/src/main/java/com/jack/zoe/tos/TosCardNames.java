@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.jack.zoe.util.J;
+
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -77,9 +80,12 @@ public class TosCardNames {
         }
 
         private void copyDatabase(Context context) {
+            J.d2(TAG, "begin copy database");
             try {
+                File targetPath = context.getDatabasePath(NAME);
+                targetPath.getParentFile().mkdir();
+                OutputStream output = new FileOutputStream(targetPath, false);
                 InputStream input = context.getAssets().open(NAME);
-                OutputStream output = new FileOutputStream(context.getDatabasePath(NAME).getPath());
 
                 byte[] buffer = new byte[1024];
                 int length;
@@ -93,6 +99,7 @@ public class TosCardNames {
             } catch (Exception ignored) {
                 ignored.printStackTrace();
             }
+            J.d2(TAG, "end copy database");
         }
     }
 

@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 import com.jack.zoe.tos.TosFile;
@@ -41,7 +42,7 @@ public class MadHeadTosObserver extends Service {
                     TosFile tosFile = TosFile.snapshot(context);
                     if (tosFile != null) {
                         NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-                        notificationManager.cancel(7533967);
+                        //notificationManager.cancel(7533967);
                         try {
                             Notification notification = this.createNotification(tosFile);
                             notificationManager.notify(7533967, notification);
@@ -54,6 +55,7 @@ public class MadHeadTosObserver extends Service {
 
             private Notification createNotification(TosFile tosFile) throws JSONException {
                 RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_tos);
+                remoteViews.setImageViewResource(R.id.icon, R.drawable.ic_launcher);
 
                 this.fillAlarm(tosFile, remoteViews);
                 this.fillLoots(tosFile, remoteViews);
