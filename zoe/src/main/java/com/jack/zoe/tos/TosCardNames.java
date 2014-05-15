@@ -80,7 +80,7 @@ public class TosCardNames {
         }
 
         private void copyDatabase(Context context) {
-            J.d2(TAG, "begin copy database");
+            J.d(TAG, "begin copy database");
             try {
                 File targetPath = context.getDatabasePath(NAME);
                 targetPath.getParentFile().mkdir();
@@ -99,7 +99,7 @@ public class TosCardNames {
             } catch (Exception ignored) {
                 ignored.printStackTrace();
             }
-            J.d2(TAG, "end copy database");
+            J.d(TAG, "end copy database");
         }
     }
 

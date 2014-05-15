@@ -3,6 +3,9 @@ package com.jack.zoe.tos;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.format.Time;
+import android.widget.Toast;
+
+import com.jack.zoe.util.J;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,7 +13,6 @@ import org.json.JSONObject;
 
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ public class TosFile {
         if (SourceFile.exists()) {
             long lastModified = SourceFile.lastModified();
             if (previousModified != lastModified) {
+                J.d(TAG, "file %s has changed", SourceFile);
                 previousModified = lastModified;
                 return true;
             }
@@ -36,21 +39,29 @@ public class TosFile {
     }
 
     public static TosFile snapshot(Context context) {
+        J.d(TAG, "try to change %s privilege to 664", SourceFile);
         try {
             Process process = Runtime.getRuntime().exec("su");
             DataOutputStream outputStream = new DataOutputStream(process.getOutputStream());
-            outputStream.writeBytes(String.format("chmod 777 %s\n", SourceFile));
+            outputStream.writeBytes(String.format("chmod 664 %s\n", SourceFile));
             outputStream.writeBytes("exit\n");
             outputStream.flush();
-            process.waitFor();
-
-            checkTosCardNames(context);
-            SharedPreferences preferences = createSharedPreferences(SourceFile, Context.MODE_PRIVATE);
-            return new TosFile(preferences);
+            outputStream.close();
+            int result = process.waitFor();
+            J.d(TAG, "privilege changed completely with code %d", result);
+            if (result != 0) {
+                Toast.makeText(context, "chmod failed", Toast.LENGTH_SHORT).show();
+                return null;
+            }
         } catch (Exception ignored) {
             ignored.printStackTrace();
+            Toast.makeText(context, "Root is required", Toast.LENGTH_SHORT).show();
             return null;
         }
+
+        checkTosCardNames(context);
+        SharedPreferences preferences = createSharedPreferences(SourceFile, Context.MODE_PRIVATE);
+        return new TosFile(preferences);
     }
 
     private static void checkTosCardNames(Context context) {

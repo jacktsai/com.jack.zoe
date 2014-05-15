@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.os.Bundle;
@@ -28,12 +29,16 @@ import java.util.TimerTask;
 
 public class MainActivity extends Activity {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
+
     private int[] picArray = new int[] { R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d, R.drawable.e, R.drawable.f, R.drawable.g, R.drawable.h, R.drawable.i, R.drawable.j };
     private int currentImageIndex = 0;
     private Timer imageScrollTimer;
     private ViewPager imagePager;
     private MessageAnimation messageAnimator;
+    private int musicVolumeBefore;
     private MediaPlayer mp3Player;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +48,12 @@ public class MainActivity extends Activity {
         this.messageAnimator = new MessageAnimation();
         this.messageAnimator.start();
 
+        AudioManager audioManager = (AudioManager)this.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        musicVolumeBefore = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        int suggestedVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) / 2;
+        if (musicVolumeBefore < suggestedVolume) {
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, suggestedVolume, 0);
+        }
         this.startBGM();
 
         PicturesAdapter adapter = new PicturesAdapter();
@@ -83,14 +94,36 @@ public class MainActivity extends Activity {
             case R.id.nlSetting:
                 this.startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
                 return true;
+
+            case R.id.roaringSetting:
+                this.startActivity(new Intent(this, RoaringSettingActivity.class));
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     @Override
+    protected void onResume() {
+        J.d(TAG, "onResume");
+        this.mp3Player.start();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        J.d(TAG, "onPause");
+        this.mp3Player.pause();
+        super.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
         this.stopBGM();
+
+        AudioManager audioManager = (AudioManager)this.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, musicVolumeBefore, 0);
+
         this.messageAnimator.cancel();
         this.stopScrollImage();
         super.onDestroy();
@@ -130,9 +163,10 @@ public class MainActivity extends Activity {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 startBGM();
+                mp3Player.start();
             }
         });
-        this.mp3Player.start();
+        this.mp3Player.setVolume(1, 1);
     }
 
     private void stopBGM(){

@@ -9,24 +9,14 @@ import java.io.FileWriter;
 
 public class J {
 
-    private static final String DEFAULT_TAG = "JackZoe";
+    private static final String TAG = J.class.getSimpleName();
 
-    public static void d(String format, Object... args) {
-        String message = String.format(format, args);
-        Log.d(DEFAULT_TAG, message);
-    }
-
-    public static void d2(String tag, String format, Object... args) {
+    public static void d(String tag, String format, Object... args) {
         String message = String.format(format, args);
         Log.d(tag, message);
     }
 
-    public static void e(String format, Object... args) {
-        String message = String.format(format, args);
-        Log.e(DEFAULT_TAG, message);
-    }
-
-    public static void e2(String tag, String format, Object... args) {
+    public static void e(String tag, String format, Object... args) {
         String message = String.format(format, args);
         Log.e(tag, message);
     }
@@ -42,10 +32,10 @@ public class J {
             }
 
             if (firstPrint) {
-                d("[<%d> %s] %s.%s [%s #%d]", t.getId(), t.getName(), e.getClassName(), e.getMethodName(), e.getFileName(), e.getLineNumber());
+                d(TAG, "[<%d> %s] %s.%s [%s #%d]", t.getId(), t.getName(), e.getClassName(), e.getMethodName(), e.getFileName(), e.getLineNumber());
                 firstPrint = false;
             } else {
-                d("-> %s.%s [%s #%d]", e.getClassName(), e.getMethodName(), e.getFileName(), e.getLineNumber());
+                d(TAG, "-> %s.%s [%s #%d]", e.getClassName(), e.getMethodName(), e.getFileName(), e.getLineNumber());
             }
         }
     }
@@ -58,7 +48,7 @@ public class J {
             synchronized (J.class) {
                 if (!zoeDir.exists()) {
                     if (!zoeDir.mkdir()) {
-                        e("failed to create directory %s", zoeDir.getPath());
+                        e(TAG, "failed to create directory %s", zoeDir.getPath());
                         return;
                     }
                 }
@@ -76,10 +66,10 @@ public class J {
                     writer.flush();
                     writer.close();
 
-                    d(message);
+                    d(TAG, message);
                 }
                 catch (Exception e) {
-                    e("failed to save file to %s", logFile.getPath());
+                    e(TAG, "failed to save file to %s", logFile.getPath());
                     e.printStackTrace();
                 }
             }

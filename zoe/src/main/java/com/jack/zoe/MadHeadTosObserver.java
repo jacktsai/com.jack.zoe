@@ -6,7 +6,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 import com.jack.zoe.tos.TosFile;
@@ -31,7 +30,7 @@ public class MadHeadTosObserver extends Service {
 
     @Override
     public void onCreate() {
-        J.d2(TAG, "onCreate");
+        J.d(TAG, "onCreate");
 
         TimerTask observerTask = new TimerTask() {
             private final Context context = getApplicationContext();
@@ -138,7 +137,7 @@ public class MadHeadTosObserver extends Service {
 
     @Override
     public void onDestroy() {
-        J.d2(TAG, "onDestroy");
+        J.d(TAG, "onDestroy");
 
         this.timer.cancel();
 
