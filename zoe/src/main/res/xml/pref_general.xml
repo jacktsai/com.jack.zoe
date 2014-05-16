@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:robobunny="http://robobunny.com">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Preference
         android:title="@string/pref_title_notification_listener">
@@ -13,23 +12,40 @@
 
         <CheckBoxPreference
             android:key="roaring_enabled"
-            android:title="@string/pref_title_roaring_enable"/>
+            android:title="@string/pref_title_roaring_enable"
+            android:summary="@string/pref_summary_roaring_enable"/>
 
         <RingtonePreference
             android:key="roaring_alert"
             android:dependency="roaring_enabled"
             android:title="@string/pref_title_roaring_alert"
             android:ringtoneType="alarm"
-            android:showSilent="false"/>
+            android:showSilent="false"
+            android:showDefault="false"/>
 
         <com.jack.zoe.preference.SeekBarPreference
             android:key="roaring_volume"
             android:dependency="roaring_enabled"
             android:title="@string/pref_title_roaring_volume"
-            android:max="7"
-            robobunny:min="0"
-            robobunny:unitsLeft=""
-            robobunny:unitsRight=""/>
+            android:max="7"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_header_slide">
+
+        <CheckBoxPreference
+            android:key="slide_use_gallery"
+            android:title="@string/pref_title_slide_use_gallery"
+            android:summary="@string/pref_summary_slide_use_gallery"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_header_tos">
+
+        <CheckBoxPreference
+            android:key="tos_show_current_loots"
+            android:title="@string/pref_title_tos_show_current_loots"
+            android:summary="@string/pref_summary_tos_show_current_loots"/>
 
     </PreferenceCategory>
 

@@ -7,7 +7,16 @@
 
     <string name="pref_header_roaring">通知擴音器</string>
     <string name="pref_title_roaring_enable">啟用通知擴音器</string>
+    <string name="pref_summary_roaring_enable">當收到神魔之塔的各種通知時，會撥放指定的提示音，並將音量調至指定的音量。</string>
     <string name="pref_title_roaring_alert">提示音</string>
     <string name="pref_title_roaring_volume">提示音量</string>
+
+    <string name="pref_header_slide">圖片撥放</string>
+    <string name="pref_title_slide_use_gallery">使用手機圖庫(研發中)</string>
+    <string name="pref_summary_slide_use_gallery">使用手機的圖片庫作為圖片撥放來源，而非程式內建的圖庫。</string>
+
+    <string name="pref_header_tos">神魔之塔相關</string>
+    <string name="pref_title_tos_show_current_loots">顯示目前獎勵</string>
+    <string name="pref_summary_tos_show_current_loots">顯示目前所在關卡的獎勵內容</string>
 
 </resources>

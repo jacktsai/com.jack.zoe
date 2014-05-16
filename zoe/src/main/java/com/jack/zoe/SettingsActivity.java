@@ -8,26 +8,22 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
 import android.preference.RingtonePreference;
 
 import com.jack.zoe.preference.SeekBarPreference;
-
-import java.util.List;
-import java.util.Set;
 
 public class SettingsActivity extends PreferenceActivity {
 
     private Settings settings;
     private Settings.Roaring roaring;
+    private Settings.ToS tos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.settings = Settings.getInstance(this);
         this.roaring = this.settings.roaring;
+        this.tos = this.settings.tos;
     }
 
     @Override
@@ -37,6 +33,23 @@ public class SettingsActivity extends PreferenceActivity {
         this.addPreferencesFromResource(R.xml.pref_general);
 
         this.setupRoaring();
+        this.setupToS();
+    }
+
+    private void setupToS() {
+        CheckBoxPreference preference = (CheckBoxPreference)this.findPreference("tos_show_current_loots");
+        Preference.OnPreferenceChangeListener changeListener = new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                boolean showCurrentLoots = (Boolean)newValue;
+                tos.set_show_current_loots(showCurrentLoots);
+                return true;
+            }
+        };
+        preference.setOnPreferenceChangeListener(changeListener);
+
+        boolean showCurrentLoots = tos.get_show_current_loots();
+        preference.setDefaultValue(showCurrentLoots);
     }
 
     private void setupRoaring() {

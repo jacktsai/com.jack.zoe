@@ -118,9 +118,46 @@ public class Settings {
         }
     }
 
+    public static class ToS {
+        private static final String TAG = Settings.class.getSimpleName();
+
+        public interface OnChangeListener {
+            void onShowCurrentLootsChange(boolean enabled);
+        }
+
+        private OnChangeListener onChangeListener;
+        private boolean showCurrentLoots;
+
+        private ToS(Context context) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+            this.showCurrentLoots = preferences.getBoolean("tos_show_current_loots", false);
+        }
+
+        public void setOnChangeListener(OnChangeListener onChangeListener) {
+            this.onChangeListener = onChangeListener;
+        }
+
+        public boolean get_show_current_loots() {
+            return this.showCurrentLoots;
+        }
+
+        public void set_show_current_loots(boolean showCurrentLoots) {
+            if (this.showCurrentLoots != showCurrentLoots) {
+                J.d(TAG, "showCurrentLoots change to %s", Boolean.toString(showCurrentLoots));
+                this.showCurrentLoots = showCurrentLoots;
+                if (this.onChangeListener != null) {
+                    this.onChangeListener.onShowCurrentLootsChange(showCurrentLoots);
+                }
+            }
+        }
+    }
+
     public final Roaring roaring;
+    public final ToS tos;
 
     private Settings(Context context) {
         roaring = new Roaring(context);
+        tos = new ToS(context);
     }
 }

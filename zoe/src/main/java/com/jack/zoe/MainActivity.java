@@ -83,6 +83,18 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onDestroy() {
+        this.stopBGM();
+
+        AudioManager audioManager = (AudioManager)this.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, musicVolumeBefore, 0);
+
+        this.messageAnimator.cancel();
+        this.stopScrollImage();
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = super.getMenuInflater();
         inflater.inflate(R.menu.main_activity_settings, menu);
@@ -113,18 +125,6 @@ public class MainActivity extends Activity {
         J.d(TAG, "onPause");
         this.mp3Player.pause();
         super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        this.stopBGM();
-
-        AudioManager audioManager = (AudioManager)this.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, musicVolumeBefore, 0);
-
-        this.messageAnimator.cancel();
-        this.stopScrollImage();
-        super.onDestroy();
     }
 
     @Override

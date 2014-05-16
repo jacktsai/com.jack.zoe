@@ -43,37 +43,8 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
     }
 
     private void initPreference(Context context, AttributeSet attrs) {
-        setValuesFromXml(attrs);
-        mSeekBar = new SeekBar(context, attrs);
-        mSeekBar.setMax(mMaxValue - mMinValue);
-        mSeekBar.setOnSeekBarChangeListener(this);
-
         setWidgetLayoutResource(R.layout.seek_bar_preference);
-    }
-
-    private void setValuesFromXml(AttributeSet attrs) {
         mMaxValue = attrs.getAttributeIntValue(ANDROIDNS, "max", 100);
-        mMinValue = attrs.getAttributeIntValue(APPLICATIONNS, "min", 0);
-
-        String units = getAttributeStringValue(attrs, APPLICATIONNS, "units", "");
-
-        try {
-            String newInterval = attrs.getAttributeValue(APPLICATIONNS, "interval");
-            if(newInterval != null)
-                mInterval = Integer.parseInt(newInterval);
-        }
-        catch(Exception e) {
-            Log.e(TAG, "Invalid interval value", e);
-        }
-
-    }
-
-    private String getAttributeStringValue(AttributeSet attrs, String namespace, String name, String defaultValue) {
-        String value = attrs.getAttributeValue(namespace, name);
-        if(value == null)
-            value = defaultValue;
-
-        return value;
     }
 
     @Override
@@ -93,52 +64,17 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
         super.onBindView(view);
 
         try {
-            // move our seekbar to the new view we've been given
-            ViewParent oldContainer = mSeekBar.getParent();
-            ViewGroup newContainer = (ViewGroup) view.findViewById(R.id.seekBarPrefBarContainer);
-
-            if (oldContainer != newContainer) {
-                // remove the seekbar from the old view
-                if (oldContainer != null) {
-                    ((ViewGroup) oldContainer).removeView(mSeekBar);
-                }
-                // remove the existing seekbar (there may not be one) and add ours
-                newContainer.removeAllViews();
-                newContainer.addView(mSeekBar, ViewGroup.LayoutParams.FILL_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-            }
-        }
-        catch(Exception ex) {
-            Log.e(TAG, "Error binding view: " + ex.toString());
-        }
-
-        //if dependency is false from the beginning, disable the seek bar
-        if (view != null && !view.isEnabled())
-        {
-            mSeekBar.setEnabled(false);
-        }
-
-        updateView(view);
-    }
-
-    /**
-     * Update a SeekBarPreference view with our current state
-     * @param view
-     */
-    protected void updateView(View view) {
-
-        try {
-            mStatusText = (TextView) view.findViewById(R.id.seekBarPrefValue);
-
+            mStatusText = (TextView) view.findViewById(R.id.text);
             mStatusText.setText(String.valueOf(mCurrentValue));
-            mStatusText.setMinimumWidth(30);
 
-            mSeekBar.setProgress(mCurrentValue - mMinValue);
+            mSeekBar = (SeekBar)view.findViewById(R.id.seekBar);
+            mSeekBar.setProgress(mCurrentValue);
+            mSeekBar.setMax(mMaxValue );
+            mSeekBar.setOnSeekBarChangeListener(this);
         }
         catch(Exception e) {
             Log.e(TAG, "Error updating seek bar preference", e);
         }
-
     }
 
     @Override

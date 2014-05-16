@@ -137,9 +137,11 @@ public class RoaringListener extends NotificationListenerService {
                 notificationIdMap.put(packageName, new ArrayList<String>());
             }
 
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
+            if (mediaPlayer != null) {
+                mediaPlayer.stop();
+                mediaPlayer.release();
+                mediaPlayer = null;
+            }
         }
     }
 }

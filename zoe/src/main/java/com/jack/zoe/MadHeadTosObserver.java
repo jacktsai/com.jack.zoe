@@ -22,7 +22,6 @@ public class MadHeadTosObserver extends Service {
 
     private static final String TAG = MadHeadTosObserver.class.getSimpleName();
 
-    private Context context;
     private Timer timer = new Timer();
 
     @Override
@@ -34,23 +33,28 @@ public class MadHeadTosObserver extends Service {
     public void onCreate() {
         J.d(TAG, "onCreate");
 
-        context = getApplicationContext();
+        final Context context = getApplicationContext();
+        final Settings.ToS tos = Settings.getInstance(context).tos;
+        final NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         TimerTask observerTask = new TimerTask() {
             @Override
             public void run() {
-                if (TosFile.isChanged()) {
-                    TosFile tosFile = TosFile.snapshot(context);
+                if (tos.get_show_current_loots()) {
+                    if (TosFile.isChanged()) {
+                        TosFile tosFile = TosFile.snapshot(context);
 
-                    if (tosFile != null) {
-                        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                        try {
-                            Notification notification = this.createNotification(tosFile);
-                            notificationManager.notify(7533967, notification);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        if (tosFile != null) {
+                            try {
+                                Notification notification = this.createNotification(tosFile);
+                                nm.notify(7533967, notification);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
+                } else {
+                    nm.cancel(7533967);
                 }
             }
 
