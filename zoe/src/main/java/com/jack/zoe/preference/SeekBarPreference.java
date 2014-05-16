@@ -28,8 +28,6 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
     private int mMinValue      = 0;
     private int mInterval      = 1;
     private int mCurrentValue;
-    private String mUnitsLeft  = "";
-    private String mUnitsRight = "";
     private SeekBar mSeekBar;
 
     private TextView mStatusText;
@@ -57,9 +55,7 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
         mMaxValue = attrs.getAttributeIntValue(ANDROIDNS, "max", 100);
         mMinValue = attrs.getAttributeIntValue(APPLICATIONNS, "min", 0);
 
-        mUnitsLeft = getAttributeStringValue(attrs, APPLICATIONNS, "unitsLeft", "");
         String units = getAttributeStringValue(attrs, APPLICATIONNS, "units", "");
-        mUnitsRight = getAttributeStringValue(attrs, APPLICATIONNS, "unitsRight", units);
 
         try {
             String newInterval = attrs.getAttributeValue(APPLICATIONNS, "interval");
@@ -138,13 +134,6 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
             mStatusText.setMinimumWidth(30);
 
             mSeekBar.setProgress(mCurrentValue - mMinValue);
-
-            TextView unitsRight = (TextView)view.findViewById(R.id.seekBarPrefUnitsRight);
-            unitsRight.setText(mUnitsRight);
-
-            TextView unitsLeft = (TextView)view.findViewById(R.id.seekBarPrefUnitsLeft);
-            unitsLeft.setText(mUnitsLeft);
-
         }
         catch(Exception e) {
             Log.e(TAG, "Error updating seek bar preference", e);
