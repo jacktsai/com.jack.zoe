@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.jack.zoe.util.J;
-import com.jack.zoe.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
