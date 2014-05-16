@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,36 +10,69 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="設定通知存取權限"
-        android:id="@+id/setupNLS" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="建立不同ID的通知"
-        android:id="@+id/createNotification1" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="建立同ID的通知"
-        android:id="@+id/createNotification2" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="撥放警告"
-        android:id="@+id/playAlarm" />
-
-    <SeekBar
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/volume" />
+        android:text="通知存取"
+        android:id="@+id/setupNLS"
+        android:layout_alignParentStart="true"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/launchSettings"
-        android:text="設定"/>
+        android:text="[設定活動]樣本"
+        android:layout_toRightOf="@+id/setupNLS" />
 
-</LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="建立不同ID的通知"
+        android:id="@+id/createNotification1"
+        android:layout_below="@+id/setupNLS"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="建立同ID的通知"
+        android:id="@+id/createNotification2"
+        android:layout_below="@+id/setupNLS"
+        android:layout_toRightOf="@id/createNotification1" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="撥放警告"
+        android:id="@+id/playAlarm"
+        android:layout_below="@+id/createNotification1"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="音量："
+        android:id="@+id/volumeField"
+        android:layout_below="@+id/playAlarm"
+        android:layout_alignParentStart="true" />
+
+    <SeekBar
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/volume"
+        android:layout_below="@+id/playAlarm"
+        android:layout_toRightOf="@+id/volumeField"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/volumeText"
+        android:layout_below="@+id/playAlarm"
+        android:layout_toRightOf="@id/volume" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="選取圖片"
+        android:id="@+id/pickupPicture"
+        android:layout_below="@+id/volume"
+        android:layout_alignParentStart="true" />
+
+</RelativeLayout>

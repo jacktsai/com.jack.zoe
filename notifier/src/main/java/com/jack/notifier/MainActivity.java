@@ -3,14 +3,18 @@ package com.jack.notifier;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Menu;
@@ -18,32 +22,35 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import java.io.IOException;
 
 public class MainActivity extends Activity {
+    private static final String TAG = MainActivity.class.getSimpleName();
+
     private MediaPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        super.setContentView(R.layout.activity_main);
+        this.setContentView(R.layout.activity_main);
 
-        super.findViewById(R.id.setupNLS).setOnClickListener(new View.OnClickListener() {
+        this.findViewById(R.id.setupNLS).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 MainActivity.this.startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
             }
         });
 
-        super.findViewById(R.id.createNotification1).setOnClickListener(new View.OnClickListener() {
+        this.findViewById(R.id.createNotification1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createNotification((int)System.currentTimeMillis());
             }
         });
 
-        super.findViewById(R.id.createNotification2).setOnClickListener(new View.OnClickListener() {
+        this.findViewById(R.id.createNotification2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createNotification(123456);
@@ -69,8 +76,8 @@ public class MainActivity extends Activity {
                 Log.d("", String.format("progress = %d", progress));
                 if (player != null) {
                     float v = (float) progress / 10;
-                    Log.d("", String.format("v = %f", v));
                     player.setVolume(v, v);
+                    ((TextView)findViewById(R.id.volumeText)).setText(Integer.toString(progress));
                 }
             }
 
@@ -85,10 +92,19 @@ public class MainActivity extends Activity {
             }
         });
 
-        super.findViewById(R.id.launchSettings).setOnClickListener(new View.OnClickListener() {
+        this.findViewById(R.id.launchSettings).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+            }
+        });
+
+        this.findViewById(R.id.pickupPicture).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/*");
+                startActivityForResult(intent, 1);
             }
         });
     }
@@ -97,6 +113,18 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
 
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case 1:
+                    Uri uri = data.getData();
+                    Log.d(TAG, String.format("data = %s, path = %s", uri, getPath(uri)));
+                    break;
+            }
+        }
     }
 
     private void createNotification(int id) {
@@ -124,5 +152,24 @@ public class MainActivity extends Activity {
         player.stop();
         player.release();
         player = null;
+    }
+
+    private String getPath(Uri uri) {
+        String[]  data = {
+                MediaStore.Images.Media.DATA,
+                MediaStore.Images.Media.SIZE,
+                MediaStore.Images.Media.TITLE
+        };
+        CursorLoader loader = new CursorLoader(this, uri, data, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        cursor.moveToFirst();
+
+        String value1 = cursor.getString(0);
+        int value2 = cursor.getInt(1);
+        String value3 = cursor.getString(2);
+
+        Log.d(TAG, String.format("%d, %s", value2, value3));
+
+        return value1;
     }
 }
