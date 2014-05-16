@@ -84,6 +84,13 @@ public class MainActivity extends Activity {
 
             }
         });
+
+        super.findViewById(R.id.launchSettings).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+            }
+        });
     }
 
     @Override
