@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="title_activity_settings">設定</string>
+
+    <string name="pref_title_notification_listener">通知存取</string>
+
+    <string name="pref_header_roaring">通知擴音器</string>
+    <string name="pref_title_roaring_enable">啟用通知擴音器</string>
+    <string name="pref_title_roaring_alert">提示音</string>
+    <string name="pref_title_roaring_volume">提示音量</string>
+
+</resources>

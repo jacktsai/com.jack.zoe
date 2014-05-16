@@ -2,11 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/nlSetting"
-        android:title="設定通知存取權限"/>
-
-    <item
-        android:id="@+id/roaringSetting"
-        android:title="設定通知鬧鈴"/>
+        android:id="@+id/settings"
+        android:title="設定"/>
 
 </menu>

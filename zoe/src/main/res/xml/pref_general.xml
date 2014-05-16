@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:robobunny="http://robobunny.com">
+
+    <Preference
+        android:title="@string/pref_title_notification_listener">
+        <intent android:action="android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"/>
+    </Preference>
+
+    <PreferenceCategory android:title="@string/pref_header_roaring">
+
+        <CheckBoxPreference
+            android:key="roaring_enabled"
+            android:title="@string/pref_title_roaring_enable"/>
+
+        <RingtonePreference
+            android:key="roaring_alert"
+            android:dependency="roaring_enabled"
+            android:title="@string/pref_title_roaring_alert"
+            android:ringtoneType="alarm"
+            android:showSilent="false"/>
+
+        <com.jack.zoe.preference.SeekBarPreference
+            android:key="roaring_volume"
+            android:dependency="roaring_enabled"
+            android:title="@string/pref_title_roaring_volume"
+            android:max="7"
+            robobunny:min="0"
+            robobunny:unitsLeft=""
+            robobunny:unitsRight=""/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

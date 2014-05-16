@@ -50,9 +50,11 @@ public class MainActivity extends Activity {
 
         AudioManager audioManager = (AudioManager)this.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         musicVolumeBefore = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        int suggestedVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) / 2;
-        if (musicVolumeBefore < suggestedVolume) {
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, suggestedVolume, 0);
+        if (musicVolumeBefore > 0) {
+            int suggestedVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) / 2;
+            if (musicVolumeBefore < suggestedVolume) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, suggestedVolume, 0);
+            }
         }
         this.startBGM();
 
@@ -91,12 +93,8 @@ public class MainActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.nlSetting:
-                this.startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
-                return true;
-
-            case R.id.roaringSetting:
-                this.startActivity(new Intent(this, RoaringSettingActivity.class));
+            case R.id.settings:
+                this.startActivity(new Intent(this, SettingsActivity.class));
                 return true;
         }
 
