@@ -30,10 +30,6 @@
         <activity
             android:name=".RoaringSettingActivity"
             android:label="@string/roaring_settings_title" >
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <action android:name="com.jack.zoe.ROARING_SETTING"/>
-            </intent-filter>
         </activity>
         
         <service

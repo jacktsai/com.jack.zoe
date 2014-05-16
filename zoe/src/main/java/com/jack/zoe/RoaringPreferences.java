@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.jack.zoe.util.J;
 import com.jack.zoe.util.StringUtil;
@@ -71,7 +72,7 @@ public class RoaringPreferences {
         editor.putString("ringtone", this.ringtone.toString());
         editor.putInt("volume", this.volume);
 
-        String packageNames = StringUtil.join(this.notificationIdMap.keySet(), ",");
+        String packageNames = TextUtils.join(",", this.notificationIdMap.keySet());
         editor.putString("packageNames", packageNames);
 
         editor.commit();

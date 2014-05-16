@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.jack.zoe.tos.TosFile;
 import com.jack.zoe.util.J;
@@ -21,6 +22,7 @@ public class MadHeadTosObserver extends Service {
 
     private static final String TAG = MadHeadTosObserver.class.getSimpleName();
 
+    private Context context;
     private Timer timer = new Timer();
 
     @Override
@@ -32,16 +34,16 @@ public class MadHeadTosObserver extends Service {
     public void onCreate() {
         J.d(TAG, "onCreate");
 
-        TimerTask observerTask = new TimerTask() {
-            private final Context context = getApplicationContext();
+        context = getApplicationContext();
 
+        TimerTask observerTask = new TimerTask() {
             @Override
             public void run() {
                 if (TosFile.isChanged()) {
                     TosFile tosFile = TosFile.snapshot(context);
+
                     if (tosFile != null) {
-                        NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-                        //notificationManager.cancel(7533967);
+                        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                         try {
                             Notification notification = this.createNotification(tosFile);
                             notificationManager.notify(7533967, notification);

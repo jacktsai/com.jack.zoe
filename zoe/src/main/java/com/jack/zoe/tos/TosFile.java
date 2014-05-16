@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,8 @@ public class TosFile {
 
     public static TosFile snapshot(Context context) {
         J.d(TAG, "try to change %s privilege to 664", SourceFile);
+
+        int result;
         try {
             Process process = Runtime.getRuntime().exec("su");
             DataOutputStream outputStream = new DataOutputStream(process.getOutputStream());
@@ -47,21 +50,21 @@ public class TosFile {
             outputStream.writeBytes("exit\n");
             outputStream.flush();
             outputStream.close();
-            int result = process.waitFor();
-            J.d(TAG, "privilege changed completely with code %d", result);
-            if (result != 0) {
-                Toast.makeText(context, "chmod failed", Toast.LENGTH_SHORT).show();
-                return null;
-            }
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
-            Toast.makeText(context, "Root is required", Toast.LENGTH_SHORT).show();
+            result = process.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
 
-        checkTosCardNames(context);
-        SharedPreferences preferences = createSharedPreferences(SourceFile, Context.MODE_PRIVATE);
-        return new TosFile(preferences);
+        if (result == 0) {
+            J.d(TAG, "privilege changed successfully");
+            checkTosCardNames(context);
+            SharedPreferences preferences = createSharedPreferences(SourceFile, Context.MODE_PRIVATE);
+            return new TosFile(preferences);
+        } else {
+            J.e(TAG, "privilege changed failed with code %d", result);
+            return null;
+        }
     }
 
     private static void checkTosCardNames(Context context) {
