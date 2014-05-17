@@ -6,6 +6,7 @@ import android.text.format.Time;
 import android.widget.Toast;
 
 import com.jack.zoe.util.J;
+import com.jack.zoe.util.Su;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,29 +41,13 @@ public class TosFile {
     }
 
     public static TosFile snapshot(Context context) {
-        J.d(TAG, "try to change %s privilege to 664", SourceFile);
+        boolean result = Su.chmod(SourceFile.toString(), 664);
 
-        int result;
-        try {
-            Process process = Runtime.getRuntime().exec("su");
-            DataOutputStream outputStream = new DataOutputStream(process.getOutputStream());
-            outputStream.writeBytes(String.format("chmod 664 %s\n", SourceFile));
-            outputStream.writeBytes("exit\n");
-            outputStream.flush();
-            outputStream.close();
-            result = process.waitFor();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        if (result == 0) {
-            J.d(TAG, "privilege changed successfully");
+        if (result) {
             checkTosCardNames(context);
             SharedPreferences preferences = createSharedPreferences(SourceFile, Context.MODE_PRIVATE);
             return new TosFile(preferences);
         } else {
-            J.e(TAG, "privilege changed failed with code %d", result);
             return null;
         }
     }

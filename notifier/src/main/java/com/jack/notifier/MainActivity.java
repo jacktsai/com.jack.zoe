@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -23,6 +25,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.jack.notifier.util.Su;
 
 import java.io.IOException;
 
@@ -107,11 +111,24 @@ public class MainActivity extends Activity {
                 startActivityForResult(intent, 1);
             }
         });
+
+        this.findViewById(R.id.queryAllImages).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                queryAllImages();
+            }
+        });
+
+        this.findViewById(R.id.queryAllBuckets).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                queryAllBuckets();
+            }
+        });
     }
 
     @Override
     protected void onDestroy() {
-
         super.onDestroy();
     }
 
@@ -155,12 +172,12 @@ public class MainActivity extends Activity {
     }
 
     private String getPath(Uri uri) {
-        String[]  data = {
+        String[]  projection = {
                 MediaStore.Images.Media.DATA,
                 MediaStore.Images.Media.SIZE,
                 MediaStore.Images.Media.TITLE
         };
-        CursorLoader loader = new CursorLoader(this, uri, data, null, null, null);
+        CursorLoader loader = new CursorLoader(this, uri, projection, null, null, null);
         Cursor cursor = loader.loadInBackground();
         cursor.moveToFirst();
 
@@ -168,8 +185,44 @@ public class MainActivity extends Activity {
         int value2 = cursor.getInt(1);
         String value3 = cursor.getString(2);
 
-        Log.d(TAG, String.format("%d, %s", value2, value3));
+        Log.d(TAG, String.format("%s, %d, %s", uri, value2, value3));
 
         return value1;
+    }
+
+    private void queryAllImages() {
+        Uri baseUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+        final String[] IMAGE_PROJECTION = new String[] {
+                MediaStore.Images.ImageColumns._ID,
+                MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
+                MediaStore.Images.ImageColumns.DATA
+        };
+
+        Cursor cursor = this.getContentResolver().query(baseUri, IMAGE_PROJECTION, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String message = String.format("%s/%d %s %s", baseUri, cursor.getInt(0), cursor.getString(1), cursor.getString(2));
+                Log.d(TAG, message);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+    }
+
+    private void queryAllBuckets() {
+        Uri baseUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+        final String[] IMAGE_PROJECTION = new String[] {
+                "DISTINCT " + MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
+        };
+
+        Cursor cursor = this.getContentResolver().query(baseUri, IMAGE_PROJECTION, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String message = String.format("bucket %s", cursor.getString(0));
+                Log.d(TAG, message);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
     }
 }

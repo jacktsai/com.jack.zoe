@@ -75,4 +75,20 @@
         android:layout_below="@+id/volume"
         android:layout_alignParentStart="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="查詢所有圖片"
+        android:id="@+id/queryAllImages"
+        android:layout_below="@+id/volume"
+        android:layout_toRightOf="@id/pickupPicture" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="查詢所有相簿"
+        android:id="@+id/queryAllBuckets"
+        android:layout_below="@+id/volume"
+        android:layout_toRightOf="@id/queryAllImages"/>
+
 </RelativeLayout>
