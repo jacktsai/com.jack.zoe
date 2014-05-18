@@ -12,8 +12,10 @@
     <string name="pref_title_roaring_volume">提示音量</string>
 
     <string name="pref_header_slide">圖片撥放</string>
-    <string name="pref_title_slide_use_gallery">使用手機圖庫(研發中)</string>
-    <string name="pref_summary_slide_use_gallery">使用手機的圖片庫作為圖片撥放來源，而非程式內建的圖庫。</string>
+    <string name="pref_title_slide_use_external">使用手機圖庫</string>
+    <string name="pref_summary_slide_use_external">使用手機的圖片庫作為圖片撥放來源，取代程式內建的圖庫。</string>
+    <string name="pref_title_slide_gallery_name">手機圖庫</string>
+
 
     <string name="pref_header_tos">神魔之塔相關</string>
     <string name="pref_title_tos_show_current_loots">顯示目前獎勵</string>

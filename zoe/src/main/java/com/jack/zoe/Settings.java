@@ -23,6 +23,19 @@ public class Settings {
         return sharedInstance;
     }
 
+    public static class Sliding {
+        private static final String TAG = Sliding.class.getSimpleName();
+
+        public interface OnChangeListener {
+            void onUseExternalChange(boolean use_external);
+        }
+
+        private boolean useExternal;
+
+        private Sliding(SharedPreferences preferences) {
+            this.useExternal = preferences.getBoolean("use_external", false);
+        }
+    }
     public static class Roaring {
         private static final String TAG = Settings.class.getSimpleName();
 

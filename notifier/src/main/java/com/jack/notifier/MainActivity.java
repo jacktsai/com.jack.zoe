@@ -125,6 +125,13 @@ public class MainActivity extends Activity {
                 queryAllBuckets();
             }
         });
+
+        this.findViewById(R.id.checkMediaScanner).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkMediaScanner();
+            }
+        });
     }
 
     @Override
@@ -200,29 +207,54 @@ public class MainActivity extends Activity {
         };
 
         Cursor cursor = this.getContentResolver().query(baseUri, IMAGE_PROJECTION, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                String message = String.format("%s/%d %s %s", baseUri, cursor.getInt(0), cursor.getString(1), cursor.getString(2));
-                Log.d(TAG, message);
-            } while (cursor.moveToNext());
+        while (cursor.moveToNext()) {
+            String message = String.format("%s/%d %s %s", baseUri, cursor.getInt(0), cursor.getString(1), cursor.getString(2));
+            Log.d(TAG, message);
         }
+
         cursor.close();
     }
 
     private void queryAllBuckets() {
-        Uri baseUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        Uri baseUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                .buildUpon()
+                .appendQueryParameter("distinct", "true")
+                .build();
 
         final String[] IMAGE_PROJECTION = new String[] {
-                "DISTINCT " + MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
+                MediaStore.Images.ImageColumns.BUCKET_ID,
+                MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
         };
 
         Cursor cursor = this.getContentResolver().query(baseUri, IMAGE_PROJECTION, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                String message = String.format("bucket %s", cursor.getString(0));
-                Log.d(TAG, message);
-            } while (cursor.moveToNext());
+        while (cursor.moveToNext()) {
+            int bucketId = cursor.getInt(0);
+            String bucketName = cursor.getString(1);
+            String hashCode = String.valueOf(bucketName.toLowerCase().hashCode());
+            String message = String.format("bucket %d %s %s", bucketId, bucketName, hashCode);
+            Log.d(TAG, message);
         }
+
         cursor.close();
+    }
+
+    private void checkMediaScanner() {
+        ContentResolver resolver = this.getContentResolver();
+        Cursor cursor = resolver.query(
+                MediaStore.getMediaScannerUri(),
+                new String[] {MediaStore.MEDIA_SCANNER_VOLUME},
+                null, null, null
+        );
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String message = String.format("scanner volume %s", cursor.getString(0));
+                Log.d(TAG, message);
+            }
+
+            cursor.close();
+        } else {
+            Log.d(TAG, String.format("not scanning now"));
+        }
     }
 }

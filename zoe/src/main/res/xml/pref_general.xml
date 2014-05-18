@@ -34,10 +34,12 @@
     <PreferenceCategory android:title="@string/pref_header_slide">
 
         <CheckBoxPreference
-            android:key="slide_use_gallery"
-            android:title="@string/pref_title_slide_use_gallery"
-            android:summary="@string/pref_summary_slide_use_gallery"/>
+            android:key="slide_use_external"
+            android:title="@string/pref_title_slide_use_external"
+            android:summary="@string/pref_summary_slide_use_external"/>
 
+        <ListPreference
+            android:key=""/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_header_tos">

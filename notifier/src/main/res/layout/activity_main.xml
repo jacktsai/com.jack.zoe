@@ -91,4 +91,12 @@
         android:layout_below="@+id/volume"
         android:layout_toRightOf="@id/queryAllImages"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="媒體掃瞄器狀態"
+        android:id="@+id/checkMediaScanner"
+        android:layout_below="@+id/pickupPicture"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>
