@@ -3,8 +3,13 @@
     android:layout_height="match_parent">
 
     <GridView
+        android:id="@+id/albums"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/albums"/>
+        android:columnWidth="148dp"
+        android:stretchMode="spacingWidthUniform"
+        android:background="@android:color/black"
+        android:numColumns="auto_fit"
+        />
 
 </RelativeLayout>

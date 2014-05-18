@@ -30,10 +30,29 @@ public class Settings {
             void onUseExternalChange(boolean use_external);
         }
 
+        private OnChangeListener onChangeListener;
         private boolean useExternal;
 
         private Sliding(SharedPreferences preferences) {
             this.useExternal = preferences.getBoolean("use_external", false);
+        }
+
+        public void setOnChangeListener(OnChangeListener onChangeListener) {
+            this.onChangeListener = onChangeListener;
+        }
+
+        public boolean get_use_external() {
+            return this.useExternal;
+        }
+
+        public void set_use_external(boolean use_external) {
+            if (this.useExternal != use_external) {
+                J.d(TAG, "use external change to %s", Boolean.toString(use_external));
+                this.useExternal = use_external;
+                if (this.onChangeListener != null) {
+                    this.onChangeListener.onUseExternalChange(use_external);
+                }
+            }
         }
     }
     public static class Roaring {
@@ -52,9 +71,7 @@ public class Settings {
         private int volume;
         private Set<String> packageNames;
 
-        private Roaring(Context context) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
+        private Roaring(SharedPreferences preferences) {
             this.enabled = preferences.getBoolean("roaring_enabled", false);
             this.alert = preferences.getString("roaring_alert", RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString());
             this.volume = preferences.getInt("roaring_volume", 5);
@@ -141,9 +158,7 @@ public class Settings {
         private OnChangeListener onChangeListener;
         private boolean showCurrentLoots;
 
-        private ToS(Context context) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
+        private ToS(SharedPreferences preferences) {
             this.showCurrentLoots = preferences.getBoolean("tos_show_current_loots", false);
         }
 
@@ -167,10 +182,14 @@ public class Settings {
     }
 
     public final Roaring roaring;
+    public final Sliding sliding;
     public final ToS tos;
 
     private Settings(Context context) {
-        roaring = new Roaring(context);
-        tos = new ToS(context);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        roaring = new Roaring(preferences);
+        sliding = new Sliding(preferences);
+        tos = new ToS(preferences);
     }
 }

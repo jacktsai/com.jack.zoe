@@ -16,6 +16,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     private Settings settings;
     private Settings.Roaring roaring;
+    private Settings.Sliding sliding;
     private Settings.ToS tos;
 
     @Override
@@ -23,6 +24,7 @@ public class SettingsActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
         this.settings = Settings.getInstance(this);
         this.roaring = this.settings.roaring;
+        this.sliding = this.settings.sliding;
         this.tos = this.settings.tos;
     }
 
@@ -33,23 +35,8 @@ public class SettingsActivity extends PreferenceActivity {
         this.addPreferencesFromResource(R.xml.pref_general);
 
         this.setupRoaring();
+        this.setupSliding();
         this.setupToS();
-    }
-
-    private void setupToS() {
-        CheckBoxPreference preference = (CheckBoxPreference)this.findPreference("tos_show_current_loots");
-        Preference.OnPreferenceChangeListener changeListener = new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                boolean showCurrentLoots = (Boolean)newValue;
-                tos.set_show_current_loots(showCurrentLoots);
-                return true;
-            }
-        };
-        preference.setOnPreferenceChangeListener(changeListener);
-
-        boolean showCurrentLoots = tos.get_show_current_loots();
-        preference.setDefaultValue(showCurrentLoots);
     }
 
     private void setupRoaring() {
@@ -114,5 +101,46 @@ public class SettingsActivity extends PreferenceActivity {
 
         int volume = roaring.get_volume();
         preference.setDefaultValue(volume);
+    }
+
+    private void setupSliding() {
+        this.setupSlidingUseExternal();
+        this.setupSlidingUseExternalAlbum();
+    }
+
+    private void setupSlidingUseExternal() {
+        CheckBoxPreference preference = (CheckBoxPreference)this.findPreference("slide_use_external");
+        Preference.OnPreferenceChangeListener changeListener = new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                boolean userExternal = (Boolean)newValue;
+                sliding.set_use_external(userExternal);
+                return true;
+            }
+        };
+        preference.setOnPreferenceChangeListener(changeListener);
+
+        boolean useExternal = sliding.get_use_external();
+        preference.setDefaultValue(useExternal);
+    }
+
+    private void setupSlidingUseExternalAlbum() {
+
+    }
+
+    private void setupToS() {
+        CheckBoxPreference preference = (CheckBoxPreference)this.findPreference("tos_show_current_loots");
+        Preference.OnPreferenceChangeListener changeListener = new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                boolean showCurrentLoots = (Boolean)newValue;
+                tos.set_show_current_loots(showCurrentLoots);
+                return true;
+            }
+        };
+        preference.setOnPreferenceChangeListener(changeListener);
+
+        boolean showCurrentLoots = tos.get_show_current_loots();
+        preference.setDefaultValue(showCurrentLoots);
     }
 }

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jack.zoe.util.J;
@@ -104,6 +105,10 @@ public class GalleryPicker extends Activity {
             }
 
             Item item = items.get(position);
+
+            ImageView thumbnail = (ImageView)view.findViewById(R.id.thumbnail);
+            thumbnail.setImageResource(R.drawable.a);
+
             TextView title = (TextView)view.findViewById(R.id.title);
             title.setText(item.bucketName);
 

@@ -22,11 +22,6 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
-            <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
-
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
         </activity>
 
         <activity
@@ -37,6 +32,10 @@
         <activity
             android:name=".GalleryPicker"
             android:label="@string/title_activity_gallerypicker" >
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
         </activity>
 
         <service

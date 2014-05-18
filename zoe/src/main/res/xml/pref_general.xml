@@ -39,7 +39,8 @@
             android:summary="@string/pref_summary_slide_use_external"/>
 
         <ListPreference
-            android:key=""/>
+            android:key="slide_use_external_album"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_header_tos">
