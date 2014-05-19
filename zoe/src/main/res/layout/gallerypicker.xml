@@ -6,10 +6,12 @@
         android:id="@+id/albums"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingTop="2dp"
         android:columnWidth="148dp"
         android:stretchMode="spacingWidthUniform"
         android:background="@android:color/black"
+        android:listSelector="@android:color/black"
         android:numColumns="auto_fit"
-        />
+        android:drawSelectorOnTop="false"/>
 
 </RelativeLayout>

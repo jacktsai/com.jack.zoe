@@ -2,6 +2,7 @@ package com.jack.zoe;
 
 import android.app.Activity;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -55,16 +56,19 @@ public class GalleryPicker extends Activity {
 
         final String[] IMAGE_PROJECTION = new String[] {
                 MediaStore.Images.ImageColumns.BUCKET_ID,
-                MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
+                MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
+                "MIN(" + MediaStore.Images.ImageColumns._ID + ")"
         };
 
-        Cursor cursor = this.getContentResolver().query(baseUri, IMAGE_PROJECTION, null, null, null);
+        Cursor cursor = this.getContentResolver().query(baseUri, IMAGE_PROJECTION, "1 = 1) GROUP BY (" + MediaStore.Images.ImageColumns.BUCKET_ID + "), (" + MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME, null, null);
         try {
             while (cursor.moveToNext()) {
                 Item item = new Item();
                 item.bucketId = cursor.getInt(0);
                 item.bucketName = cursor.getString(1);
+                item._id = cursor.getInt(2);
                 items.add(item);
+                J.d(TAG, "bucket ID %d, bucket name %s, added", item.bucketId, item.bucketName);
             }
         } finally {
             cursor.close();
@@ -74,6 +78,7 @@ public class GalleryPicker extends Activity {
     class Item {
         int bucketId;
         String bucketName;
+        int _id;
     }
 
     class Adapter extends BaseAdapter {
@@ -106,8 +111,9 @@ public class GalleryPicker extends Activity {
 
             Item item = items.get(position);
 
-            ImageView thumbnail = (ImageView)view.findViewById(R.id.thumbnail);
-            thumbnail.setImageResource(R.drawable.a);
+            ImageView imageView = (ImageView)view.findViewById(R.id.thumbnail);
+            Bitmap thumbnail = MediaStore.Images.Thumbnails.getThumbnail(getContentResolver(), item._id, MediaStore.Images.Thumbnails.MICRO_KIND, null);
+            imageView.setImageBitmap(thumbnail);
 
             TextView title = (TextView)view.findViewById(R.id.title);
             title.setText(item.bucketName);
