@@ -1,18 +1,29 @@
 package com.jack.zoe;
 
+import android.content.ClipData;
 import android.content.Context;
+import android.database.Cursor;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.RingtonePreference;
+import android.provider.MediaStore;
 
+import com.jack.zoe.preference.GalleryPreference;
 import com.jack.zoe.preference.SeekBarPreference;
+import com.jack.zoe.util.J;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SettingsActivity extends PreferenceActivity {
+    private static final String TAG = SettingsActivity.class.getSimpleName();
 
     private Settings settings;
     private Settings.Roaring roaring;
@@ -105,11 +116,11 @@ public class SettingsActivity extends PreferenceActivity {
 
     private void setupSliding() {
         this.setupSlidingUseExternal();
-        this.setupSlidingUseExternalAlbum();
+        this.setupSlidingUseExternalBucketName();
     }
 
     private void setupSlidingUseExternal() {
-        CheckBoxPreference preference = (CheckBoxPreference)this.findPreference("slide_use_external");
+        CheckBoxPreference preference = (CheckBoxPreference)this.findPreference("sliding_use_external");
         Preference.OnPreferenceChangeListener changeListener = new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -124,8 +135,27 @@ public class SettingsActivity extends PreferenceActivity {
         preference.setDefaultValue(useExternal);
     }
 
-    private void setupSlidingUseExternalAlbum() {
+    private void setupSlidingUseExternalBucketName() {
+        GalleryPreference preference = (GalleryPreference)this.findPreference("sliding_use_external_bucket_Name");
+        Preference.OnPreferenceChangeListener changeListener = new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                String bucketName = (String)newValue;
+                if (bucketName != null) {
+                    preference.setSummary(bucketName);
+                    sliding.set_bucket_name(bucketName);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+        preference.setOnPreferenceChangeListener(changeListener);
 
+        String bucketName = sliding.get_bucket_name();
+        if (bucketName != null) {
+            changeListener.onPreferenceChange(preference, bucketName);
+        }
     }
 
     private void setupToS() {

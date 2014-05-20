@@ -1,6 +1,7 @@
 package com.jack.zoe;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -20,6 +21,8 @@ import com.jack.zoe.util.J;
 import java.util.ArrayList;
 
 public class GalleryPicker extends Activity {
+    public static final String EXTRA_GALLERY_PICKED_BUCKET_ID = "zoe.intent.extra.gallery.PICKET_BUCKET_ID";
+    public static final String EXTRA_GALLERY_PICKED_BUCKET_NAME = "zoe.intent.extra.gallery.PICKET_BUCKET_NAME";
     private static final String TAG = GalleryPicker.class.getSimpleName();
 
     private GridView gridView;
@@ -36,6 +39,11 @@ public class GalleryPicker extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Item item = items.get(position);
                 J.d(TAG, "selected %d %s", item.bucketId, item.bucketName);
+                Intent intent = getIntent();
+                intent.putExtra(EXTRA_GALLERY_PICKED_BUCKET_ID, item.bucketId);
+                intent.putExtra(EXTRA_GALLERY_PICKED_BUCKET_NAME, item.bucketName);
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
     }

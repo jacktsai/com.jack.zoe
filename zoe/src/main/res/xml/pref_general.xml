@@ -34,12 +34,15 @@
     <PreferenceCategory android:title="@string/pref_header_slide">
 
         <CheckBoxPreference
-            android:key="slide_use_external"
+            android:key="sliding_use_external"
             android:title="@string/pref_title_slide_use_external"
             android:summary="@string/pref_summary_slide_use_external"/>
 
-        <ListPreference
-            android:key="slide_use_external_album"/>
+        <com.jack.zoe.preference.GalleryPreference
+            android:key="sliding_use_external_bucket_Name"
+            android:title="@string/pref_title_slide_bucket_name"
+            android:dependency="sliding_use_external">
+        </com.jack.zoe.preference.GalleryPreference>
 
     </PreferenceCategory>
 

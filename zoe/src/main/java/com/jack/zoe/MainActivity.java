@@ -5,13 +5,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.provider.MediaStore;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,6 +29,9 @@ import android.widget.TextView;
 
 import com.jack.zoe.util.J;
 
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,7 +40,7 @@ public class MainActivity extends Activity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private int[] picArray = new int[] { R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d, R.drawable.e, R.drawable.f, R.drawable.g, R.drawable.h, R.drawable.i, R.drawable.j };
+    private PicturesAdapter adapter;
     private int currentImageIndex = 0;
     private Timer imageScrollTimer;
     private ViewPager imagePager;
@@ -42,8 +51,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        super.setTitle(R.string.main_title);
-        super.setContentView(R.layout.activity_main);
+        this.setTitle(R.string.main_title);
+        this.setContentView(R.layout.activity_main);
 
         this.messageAnimator = new MessageAnimation();
         this.messageAnimator.start();
@@ -58,10 +67,9 @@ public class MainActivity extends Activity {
         }
         this.startBGM();
 
-        PicturesAdapter adapter = new PicturesAdapter();
+        this.adapter = new PicturesAdapter();
         this.imagePager = (ViewPager)super.findViewById(R.id.imagePager);
         this.imagePager.setAdapter(adapter);
-        this.imagePager.setOffscreenPageLimit(adapter.getCount());
         this.imagePager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -172,9 +180,28 @@ public class MainActivity extends Activity {
         this.mp3Player.release();
     }
 
-    class PicturesAdapter extends PagerAdapter {
+    class PicturesAdapter extends PagerAdapter implements Settings.Sliding.OnChangeListener {
+        private final String TAG = PicturesAdapter.class.getSimpleName();
+
+        private int[] picArray = new int[] { R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d, R.drawable.e, R.drawable.f, R.drawable.g, R.drawable.h, R.drawable.i, R.drawable.j };
+        Settings.Sliding sliding;
+        private ArrayList<String> imageList = new ArrayList<String>();
+
+        PicturesAdapter() {
+            sliding = Settings.getInstance(MainActivity.this).sliding;
+            String bucketName = sliding.get_bucket_name();
+            if (sliding.get_use_external() && !TextUtils.isEmpty(bucketName)) {
+                this.updateImageUri(bucketName);
+            }
+            sliding.setOnChangeListener(this);
+        }
+
         @Override
         public int getCount() {
+            if (sliding.get_use_external() && imageList.size() > 0) {
+                return imageList.size();
+            }
+
             return picArray.length;
         }
 
@@ -183,7 +210,12 @@ public class MainActivity extends Activity {
             View view = View.inflate(container.getContext(), R.layout.fragment_image, null);
 
             ImageView image = (ImageView)view.findViewById(R.id.mainImage);
-            image.setImageResource(picArray[position]);
+            if (sliding.get_use_external() && imageList.size() > 0) {
+                Bitmap bitmap = decodeSampledBitmapFile(imageList.get(position), 300, 300);
+                image.setImageBitmap(bitmap);
+            } else {
+                image.setImageResource(picArray[position]);
+            }
 
             container.addView(view);
 
@@ -199,6 +231,75 @@ public class MainActivity extends Activity {
         public boolean isViewFromObject(View view, Object object) {
             return view == object;
         }
+
+        @Override
+        public void onUseExternalChange(boolean use_external) {
+            this.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onBucketIdChange(String bucket_name) {
+            this.updateImageUri(bucket_name);
+            this.notifyDataSetChanged();
+        }
+
+        private void updateImageUri(String bucketName) {
+            Uri baseUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+            imageList.clear();
+            Cursor cursor = getContentResolver().query(
+                    baseUri,
+                    new String[] {MediaStore.Images.ImageColumns.DATA},
+                    MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME + "=?",
+                    new String[] {bucketName},
+                    null);
+            try {
+                while (cursor.moveToNext()) {
+                    String filePath = cursor.getString(0);
+                    imageList.add(filePath);
+                    J.d(TAG, "image file %s added", filePath);
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+
+        private Bitmap decodeSampledBitmapFile(String filePath, int reqWidth, int reqHeight) {
+            // First decode with inJustDecodeBounds=true to check dimensions
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(filePath, options);
+
+            // Calculate inSampleSize
+            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+            // Decode bitmap with inSampleSize set
+            options.inJustDecodeBounds = false;
+            return BitmapFactory.decodeFile(filePath, options);
+        }
+
+        private int calculateInSampleSize(
+                BitmapFactory.Options options, int reqWidth, int reqHeight) {
+            // Raw height and width of image
+            final int height = options.outHeight;
+            final int width = options.outWidth;
+            int inSampleSize = 1;
+
+            if (height > reqHeight || width > reqWidth) {
+
+                final int halfHeight = height / 2;
+                final int halfWidth = width / 2;
+
+                // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+                // height and width larger than the requested height and width.
+                while ((halfHeight / inSampleSize) > reqHeight
+                        && (halfWidth / inSampleSize) > reqWidth) {
+                    inSampleSize *= 2;
+                }
+            }
+
+            return inSampleSize;
+        }
     }
 
     class ImageScrollTask extends TimerTask {
@@ -210,7 +311,7 @@ public class MainActivity extends Activity {
             private void scrollToNextImage() {
                 int index = currentImageIndex;
                 index = index + 1;
-                if ( index >= picArray.length) {
+                if ( index >= adapter.getCount()) {
                     index = 0;
                 }
 

@@ -1,6 +1,7 @@
 package com.jack.zoe;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.preference.PreferenceManager;
@@ -28,13 +29,16 @@ public class Settings {
 
         public interface OnChangeListener {
             void onUseExternalChange(boolean use_external);
+            void onBucketIdChange(String bucket_name);
         }
 
         private OnChangeListener onChangeListener;
         private boolean useExternal;
+        private String bucketName;
 
         private Sliding(SharedPreferences preferences) {
-            this.useExternal = preferences.getBoolean("use_external", false);
+            this.useExternal = preferences.getBoolean("sliding_use_external", false);
+            this.bucketName = preferences.getString("sliding_use_external_bucket_Name", null);
         }
 
         public void setOnChangeListener(OnChangeListener onChangeListener) {
@@ -51,6 +55,20 @@ public class Settings {
                 this.useExternal = use_external;
                 if (this.onChangeListener != null) {
                     this.onChangeListener.onUseExternalChange(use_external);
+                }
+            }
+        }
+
+        public String get_bucket_name() {
+            return this.bucketName;
+        }
+
+        public void set_bucket_name(String bucket_name) {
+            if (!bucket_name.equals(this.bucketName)) {
+                J.d(TAG, "bucket name change to %s", bucket_name);
+                this.bucketName = bucket_name;
+                if (this.onChangeListener != null) {
+                    this.onChangeListener.onBucketIdChange(bucket_name);
                 }
             }
         }
