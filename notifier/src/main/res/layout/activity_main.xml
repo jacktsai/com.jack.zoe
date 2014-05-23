@@ -107,4 +107,36 @@
         android:layout_below="@+id/checkMediaScanner"
         android:layout_alignParentStart="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="啟動服務"
+        android:id="@+id/startService"
+        android:layout_below="@id/showContentProviders"
+        android:layout_alignParentStart="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止服務"
+        android:id="@+id/stopService"
+        android:layout_below="@id/showContentProviders"
+        android:layout_toRightOf="@id/startService"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="繫結服務"
+        android:id="@+id/bindService"
+        android:layout_below="@id/showContentProviders"
+        android:layout_toRightOf="@id/stopService"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="解除服務"
+        android:id="@+id/unbindService"
+        android:layout_below="@id/showContentProviders"
+        android:layout_toRightOf="@id/bindService"/>
+
 </RelativeLayout>

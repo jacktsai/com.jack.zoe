@@ -3,10 +3,12 @@ package com.jack.notifier;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
@@ -19,6 +21,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -141,6 +144,50 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 showContentProviders();
+            }
+        });
+
+        this.findViewById(R.id.startService).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                J.d(TAG, "startService_onClick");
+                startService(new Intent(MainActivity.this, EmptyService.class));
+            }
+        });
+
+        this.findViewById(R.id.stopService).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                J.i(TAG, "stopService_onClick");
+                stopService(new Intent(MainActivity.this, EmptyService.class));
+            }
+        });
+
+        final ServiceConnection connection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                J.i(TAG, "onServiceConnected");
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                J.i(TAG, "onServiceDisconnected");
+            }
+        };
+
+        this.findViewById(R.id.bindService).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                J.i(TAG, "bindService_onClick");
+                bindService(new Intent(MainActivity.this, EmptyService.class), connection, Context.BIND_AUTO_CREATE);
+            }
+        });
+
+        this.findViewById(R.id.unbindService).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                J.i(TAG, "unbindService_onClick");
+                unbindService(connection);
             }
         });
     }
