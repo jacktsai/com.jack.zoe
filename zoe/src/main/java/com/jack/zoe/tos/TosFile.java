@@ -62,7 +62,8 @@ public class TosFile {
         try {
             Class<?> implClass = Class.forName("android.app.SharedPreferencesImpl");
             Constructor<?> constructor = implClass.getDeclaredConstructor(File.class, int.class);
-            return  (SharedPreferences)constructor.newInstance(file, mode);
+            constructor.setAccessible(true);
+            return (SharedPreferences)constructor.newInstance(file, mode);
         } catch (Exception ignored) {
             ignored.printStackTrace();
             return null;

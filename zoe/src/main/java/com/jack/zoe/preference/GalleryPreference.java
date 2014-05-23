@@ -11,6 +11,8 @@ import android.util.AttributeSet;
 import com.jack.zoe.GalleryPicker;
 import com.jack.zoe.util.J;
 
+import java.lang.reflect.Method;
+
 public class GalleryPreference extends Preference implements PreferenceManager.OnActivityResultListener {
     private static final String TAG = GalleryPreference.class.getSimpleName();
 
@@ -68,8 +70,13 @@ public class GalleryPreference extends Preference implements PreferenceManager.O
     private void registerOnActivityResultListener(PreferenceManager preferenceManager) {
         Class<?> pmClass = PreferenceManager.class;
         try {
-            pmClass.getDeclaredMethod("registerOnActivityResultListener", PreferenceManager.OnActivityResultListener.class).invoke(preferenceManager, this);
-            this.requestCode = (Integer)pmClass.getDeclaredMethod("getNextRequestCode").invoke(preferenceManager);
+            Method registerOnActivityResultListener = pmClass.getDeclaredMethod("registerOnActivityResultListener", PreferenceManager.OnActivityResultListener.class);
+            registerOnActivityResultListener.setAccessible(true);
+            registerOnActivityResultListener.invoke(preferenceManager, this);
+
+            Method getNextRequestCode = pmClass.getDeclaredMethod("getNextRequestCode");
+            getNextRequestCode.setAccessible(true);
+            this.requestCode = (Integer)getNextRequestCode.invoke(preferenceManager);
         } catch (Exception ignored) {
             ignored.printStackTrace();
         }

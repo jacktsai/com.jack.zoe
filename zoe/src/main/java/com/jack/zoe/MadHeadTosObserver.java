@@ -2,6 +2,7 @@ package com.jack.zoe;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -62,34 +63,18 @@ public class MadHeadTosObserver extends Service {
                 RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_tos);
                 remoteViews.setImageViewResource(R.id.icon, R.drawable.ic_launcher);
 
-                this.fillAlarm(tosFile, remoteViews);
                 this.fillLoots(tosFile, remoteViews);
+
+                PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(context, TosLootsActivity.class), 0);
 
                 Notification notification = new Notification.Builder(context)
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setOngoing(true)
+                        .setContentIntent(contentIntent)
                         .build();
                 notification.bigContentView = remoteViews;
 
                 return notification;
-            }
-
-            private void fillAlarm(TosFile tosFile, RemoteViews remoteViews) throws JSONException {
-                Iterable<TosFile.Alarm> alarms = tosFile.ALARM_SETTING();
-                int alarmCount = 0;
-                StringBuilder message = new StringBuilder();
-
-                if (alarms != null) {
-                    for (TosFile.Alarm alarm : alarms) {
-                        if (alarmCount > 0)
-                            message.append("\n");
-
-                        message.append(String.format("%s %s", alarm.J_C_TIMESTAMP().format("%m-%d %H:%M"), alarm.J_MESSAGE()));
-                        alarmCount++;
-                    }
-                }
-
-                remoteViews.setTextViewText(R.id.alarm_desc, message.toString());
             }
 
             private void fillLoots(TosFile tosFile, RemoteViews remoteViews) throws JSONException {

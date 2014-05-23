@@ -7,6 +7,9 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -26,6 +29,7 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.jack.notifier.util.J;
 import com.jack.notifier.util.Su;
 
 import java.io.IOException;
@@ -130,6 +134,13 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 checkMediaScanner();
+            }
+        });
+
+        this.findViewById(R.id.showContentProviders).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showContentProviders();
             }
         });
     }
@@ -255,6 +266,16 @@ public class MainActivity extends Activity {
             cursor.close();
         } else {
             Log.d(TAG, String.format("not scanning now"));
+        }
+    }
+
+    private void showContentProviders() {
+        for (PackageInfo packageInfo : getPackageManager().getInstalledPackages(PackageManager.GET_PROVIDERS)) {
+            if (packageInfo.providers != null) {
+                for (ProviderInfo providerInfo : packageInfo.providers) {
+                    J.d(TAG, "provider: %s, %s", providerInfo.authority, providerInfo.readPermission);
+                }
+            }
         }
     }
 }
