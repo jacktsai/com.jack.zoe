@@ -11,16 +11,19 @@ import com.jack.notifier.util.J;
 public class EmptyService extends Service {
     private static final String TAG = EmptyService.class.getSimpleName();
 
+    private MyFloatView floatView;
+
     @Override
     public void onCreate() {
         J.i(TAG, "onCreate");
-        super.onCreate();
+
+
     }
 
     @Override
     public void onDestroy() {
         J.i(TAG, "onDestroy");
-        super.onDestroy();
+
     }
 
     @Override

@@ -15,6 +15,8 @@ import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -25,10 +27,13 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -41,6 +46,7 @@ public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private MediaPlayer player;
+    private MyFloatView floatView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,6 +196,22 @@ public class MainActivity extends Activity {
                 unbindService(connection);
             }
         });
+
+        this.findViewById(R.id.createFloatView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                J.i(TAG, "createFloatView_onClick");
+                createFloatView();
+            }
+        });
+
+        this.findViewById(R.id.destroyFloatView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                J.i(TAG, "destroyFloatView_onClick");
+                destroyFloatView();
+            }
+        });
     }
 
     @Override
@@ -312,7 +334,7 @@ public class MainActivity extends Activity {
 
             cursor.close();
         } else {
-            Log.d(TAG, String.format("not scanning now"));
+            Log.d(TAG, String.format("not scanningnow"));
         }
     }
 
@@ -323,6 +345,20 @@ public class MainActivity extends Activity {
                     J.d(TAG, "provider: %s, %s", providerInfo.authority, providerInfo.readPermission);
                 }
             }
+        }
+    }
+
+    private void createFloatView() {
+        if (floatView == null) {
+            floatView = new MyFloatView(this);
+            floatView.show();
+        }
+    }
+
+    private void destroyFloatView() {
+        if (floatView != null) {
+            floatView.dismiss();
+            floatView = null;
         }
     }
 }
