@@ -9,6 +9,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -18,46 +19,30 @@ public class EmptyService extends Service {
     private static final String TAG = EmptyService.class.getSimpleName();
 
     private MyFloatView floatView;
-    private View menu;
+    private MyFloatMenu floatMenu;
 
     @Override
     public void onCreate() {
         J.i(TAG, "onCreate");
-
-        LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        menu = inflater.inflate(R.layout.float_menu, null);
-
-        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-        layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
-        layoutParams.format = PixelFormat.TRANSLUCENT;
-        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
-        layoutParams.x = 0;
-        layoutParams.y = 0;
-        layoutParams.width = 100;
-        layoutParams.height = 100;
-
-        WindowManager windowManager = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
-        windowManager.addView(menu, layoutParams);
-
-//        floatView = new MyFloatView(this);
+        floatView = new MyFloatView(this);
+        floatMenu = new MyFloatMenu(this);
     }
 
     @Override
     public void onDestroy() {
         J.i(TAG, "onDestroy");
-        WindowManager windowManager = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
-        windowManager.removeView(menu);
-//        floatView.dismiss();
+        floatView.dismiss();
+        floatMenu.dismiss();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId) {
         J.i(TAG, "onStartCommand, flags=%d, startId=%d", flags, startId);
 
-//        if (startId == 1) {
-//            floatView.show();
-//        }
+        if (startId == 1) {
+            floatView.show();
+            floatMenu.show();
+        }
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -87,6 +72,5 @@ public class EmptyService extends Service {
     }
 
     class MyBinder extends Binder {
-
     }
 }
