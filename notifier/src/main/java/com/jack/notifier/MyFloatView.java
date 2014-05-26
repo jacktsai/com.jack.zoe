@@ -1,62 +1,43 @@
 package com.jack.notifier;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.graphics.Rect;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.jack.notifier.util.J;
-
 public class MyFloatView extends ImageView {
     private static final String TAG = MyFloatView.class.getSimpleName();
 
-    private static int getStatusBarHeight(Activity activity) {
-        Rect frame = new Rect();
-        activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
-        int statusBarHeight = frame.top;
-        J.i(TAG, "window visible display frame: %s", frame.toString());
-
-        return statusBarHeight;
-    }
-
-    private int statusBarHeight;
     private WindowManager windowManager;
     private WindowManager.LayoutParams layoutParams;
-    private float startX, startY;
-    private float x, y;
+    private int prevX, prevY;
+    private float startX, startY, currX, currY;
 
-    public MyFloatView(Activity activity) {
-        super(activity);
+    public MyFloatView(Context context) {
+        super(context);
         this.setImageResource(R.drawable.ic_launcher);
         this.setBackgroundColor(Color.WHITE);
-        this.statusBarHeight = getStatusBarHeight(activity);
-        this.windowManager = (WindowManager)activity.getSystemService(Context.WINDOW_SERVICE);
+        this.windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
         this.initializeLayoutParams();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        x = event.getRawX();
-        y = event.getRawY();
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                startX = event.getX();
-                startY = event.getY();
-                updatePosition();
+                prevX = layoutParams.x;
+                prevY = layoutParams.y;
+                startX = event.getRawX();
+                startY = event.getRawY();
                 break;
             case MotionEvent.ACTION_MOVE:
+                currX = event.getRawX();
+                currY = event.getRawY();
                 updatePosition();
-                break;
-            case MotionEvent.ACTION_UP:
-                updatePosition();
-                startX = 0;
-                startY = 0;
                 break;
         }
 
@@ -84,8 +65,8 @@ public class MyFloatView extends ImageView {
     }
 
     private void updatePosition() {
-        layoutParams.x = (int)(x - startX);
-        layoutParams.y = (int)(y - startY - statusBarHeight);
+        layoutParams.x = (int)(prevX - startX + currX);
+        layoutParams.y = (int)(prevY - startY + currY);
         windowManager.updateViewLayout(this, layoutParams);
     }
 }
