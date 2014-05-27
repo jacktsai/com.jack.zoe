@@ -11,6 +11,11 @@ public class J {
 
     private static final String TAG = J.class.getSimpleName();
 
+    public static void v(String tag, String format, Object... args) {
+        String message = String.format(format, args);
+        Log.v(tag, message);
+    }
+
     public static void d(String tag, String format, Object... args) {
         String message = String.format(format, args);
         Log.d(tag, message);
@@ -21,14 +26,19 @@ public class J {
         Log.i(tag, message);
     }
 
+    public static void w(String tag, String format, Object... args) {
+        String message = String.format(format, args);
+        Log.w(tag, message);
+    }
+
     public static void e(String tag, String format, Object... args) {
         String message = String.format(format, args);
         Log.e(tag, message);
     }
 
-    public static void w(String tag, String format, Object... args) {
+    public static void a(String tag, String format, Object... args) {
         String message = String.format(format, args);
-        Log.w(tag, message);
+        Log.wtf(tag, message);
     }
 
     public static void printStackTrace() {

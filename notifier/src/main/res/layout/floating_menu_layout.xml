@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/mode"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@drawable/floating_menu_border2"
+        android:textSize="22sp"
+        android:textColor="@android:color/white"
+        android:gravity="center"/>
+
+    <ImageView
+        android:id="@+id/perform"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@drawable/floating_menu_border1"
+        android:src="#ffff0000"/>
+
+    <ImageView
+        android:id="@+id/setting"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@drawable/floating_menu_border2"
+        android:src="#ff00ff00"/>
+
+    <ImageView
+        android:id="@+id/exit"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@drawable/floating_menu_border1"
+        android:src="#ff000000"/>
+
+</LinearLayout>
