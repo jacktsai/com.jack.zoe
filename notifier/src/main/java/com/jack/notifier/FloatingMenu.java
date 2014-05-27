@@ -135,11 +135,13 @@ public class FloatingMenu extends FrameLayout {
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_MOVE:
+                layoutParams.x = (int)(layoutParams.x - startX + currX);
+                layoutParams.y = (int)(layoutParams.y - startY + currY);
+                windowManager.updateViewLayout(this, layoutParams);
+                startX = currX;
+                startY = currY;
                 currX = event.getRawX();
                 currY = event.getRawY();
-                layoutParams.x = (int) (prevX - startX + currX);
-                layoutParams.y = (int) (prevY - startY + currY);
-                windowManager.updateViewLayout(this, layoutParams);
                 break;
         }
 
@@ -150,8 +152,6 @@ public class FloatingMenu extends FrameLayout {
     public boolean onInterceptTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                prevX = layoutParams.x;
-                prevY = layoutParams.y;
                 startX = event.getRawX();
                 startY = event.getRawY();
                 break;
