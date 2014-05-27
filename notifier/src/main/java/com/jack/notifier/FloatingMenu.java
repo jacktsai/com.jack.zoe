@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -45,6 +46,7 @@ public class FloatingMenu extends FrameLayout {
     private int prevX, prevY;
     private float startX, startY, currX, currY;
     private boolean moving = false;
+    private int touchSlop;
 
     public FloatingMenu(final EmptyService context) {
         super(context);
@@ -127,11 +129,31 @@ public class FloatingMenu extends FrameLayout {
                 context.stopSelf();
             }
         });
+
+//        setBackgroundColor(Color.DKGRAY);
+//        layoutParams.height = iconHeight * 2;
+        touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+        J.i(TAG, "touch slop = %d", touchSlop);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_MOVE:
+                currX = event.getRawX();
+                currY = event.getRawY();
+                layoutParams.x = (int) (prevX - startX + currX);
+                layoutParams.y = (int) (prevY - startY + currY);
+                windowManager.updateViewLayout(this, layoutParams);
+                break;
+        }
+
+        return true;
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        switch (event.getActionMasked()) {
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 prevX = layoutParams.x;
                 prevY = layoutParams.y;
@@ -141,16 +163,7 @@ public class FloatingMenu extends FrameLayout {
             case MotionEvent.ACTION_MOVE:
                 currX = event.getRawX();
                 currY = event.getRawY();
-                if ((Math.abs(startX - currX) >= 10 || Math.abs(startY - currY) >= 10) && event.getPointerCount() == 1) {
-                    layoutParams.x = (int) (prevX - startX + currX);
-                    layoutParams.y = (int) (prevY - startY + currY);
-                    windowManager.updateViewLayout(this, layoutParams);
-                    moving = true;
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                if (moving) {
-                    moving = false;
+                if ((Math.abs(startX - currX) >= touchSlop || Math.abs(startY - currY) >= touchSlop) && event.getPointerCount() == 1) {
                     return true;
                 }
                 break;
