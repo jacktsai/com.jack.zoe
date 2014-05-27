@@ -45,11 +45,15 @@ public class MyFloatView extends ImageView {
     }
 
     public void show() {
-        windowManager.addView(this, layoutParams);
+        if (!this.isShown()) {
+            windowManager.addView(this, layoutParams);
+        }
     }
 
     public void dismiss() {
-        windowManager.removeView(this);
+        if (this.isShown()) {
+            windowManager.removeView(this);
+        }
     }
 
     private void initializeLayoutParams() {
@@ -60,8 +64,8 @@ public class MyFloatView extends ImageView {
         layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
         layoutParams.x = 500;
         layoutParams.y = 950;
-        layoutParams.width = 150;
-        layoutParams.height = 150;
+        layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
     }
 
     private void updatePosition() {

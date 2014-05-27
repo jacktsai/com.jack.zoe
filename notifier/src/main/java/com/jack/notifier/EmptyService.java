@@ -18,20 +18,17 @@ import com.jack.notifier.util.J;
 public class EmptyService extends Service {
     private static final String TAG = EmptyService.class.getSimpleName();
 
-    private MyFloatView floatView;
     private MyFloatMenu floatMenu;
 
     @Override
     public void onCreate() {
         J.i(TAG, "onCreate");
-        floatView = new MyFloatView(this);
         floatMenu = new MyFloatMenu(this);
     }
 
     @Override
     public void onDestroy() {
         J.i(TAG, "onDestroy");
-        floatView.dismiss();
         floatMenu.dismiss();
     }
 
@@ -39,10 +36,7 @@ public class EmptyService extends Service {
     public int onStartCommand(Intent intent, int flags, final int startId) {
         J.i(TAG, "onStartCommand, flags=%d, startId=%d", flags, startId);
 
-        if (startId == 1) {
-            floatView.show();
-            floatMenu.show();
-        }
+        floatMenu.show();
 
         return super.onStartCommand(intent, flags, startId);
     }
