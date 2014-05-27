@@ -34,7 +34,6 @@ public class FloatingMenu extends FrameLayout {
         layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
         layoutParams.format = PixelFormat.TRANSLUCENT;
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-//        layoutParams.gravity = Gravity.TOP;
         layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -45,7 +44,6 @@ public class FloatingMenu extends FrameLayout {
     private WindowManager.LayoutParams layoutParams = createLayoutParams();
     private int prevX, prevY;
     private float startX, startY, currX, currY;
-    private boolean moving = false;
     private int touchSlop;
 
     public FloatingMenu(final EmptyService context) {
@@ -130,10 +128,7 @@ public class FloatingMenu extends FrameLayout {
             }
         });
 
-//        setBackgroundColor(Color.DKGRAY);
-//        layoutParams.height = iconHeight * 2;
         touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
-        J.i(TAG, "touch slop = %d", touchSlop);
     }
 
     @Override
