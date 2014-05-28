@@ -42,8 +42,7 @@ public class FloatingMenu extends FrameLayout {
 
     private WindowManager windowManager;
     private WindowManager.LayoutParams layoutParams = createLayoutParams();
-    private int prevX, prevY;
-    private float startX, startY, currX, currY;
+    private float startX, startY;
     private int touchSlop;
 
     public FloatingMenu(final EmptyService context) {
@@ -135,13 +134,13 @@ public class FloatingMenu extends FrameLayout {
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_MOVE:
-                layoutParams.x = (int)(layoutParams.x - startX + currX);
-                layoutParams.y = (int)(layoutParams.y - startY + currY);
+                float x = event.getRawX();
+                float y = event.getRawY();
+                layoutParams.x = (int)(layoutParams.x - startX + x);
+                layoutParams.y = (int)(layoutParams.y - startY + y);
                 windowManager.updateViewLayout(this, layoutParams);
-                startX = currX;
-                startY = currY;
-                currX = event.getRawX();
-                currY = event.getRawY();
+                startX = x;
+                startY = y;
                 break;
         }
 
@@ -156,9 +155,9 @@ public class FloatingMenu extends FrameLayout {
                 startY = event.getRawY();
                 break;
             case MotionEvent.ACTION_MOVE:
-                currX = event.getRawX();
-                currY = event.getRawY();
-                if ((Math.abs(startX - currX) >= touchSlop || Math.abs(startY - currY) >= touchSlop) && event.getPointerCount() == 1) {
+                float x = event.getRawX();
+                float y = event.getRawY();
+                if ((Math.abs(startX - x) >= touchSlop || Math.abs(startY - y) >= touchSlop) && event.getPointerCount() == 1) {
                     return true;
                 }
                 break;
