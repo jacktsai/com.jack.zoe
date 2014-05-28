@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="啟動服務"
+        android:id="@+id/startService"
+        android:layout_alignParentStart="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止服務"
+        android:id="@+id/stopService"
+        android:layout_toRightOf="@id/startService"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="繫結服務"
+        android:id="@+id/bindService"
+        android:layout_below="@id/startService"
+        android:layout_alignParentStart="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="解除服務"
+        android:id="@+id/unbindService"
+        android:layout_below="@id/startService"
+        android:layout_toRightOf="@id/bindService"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="建立懸浮視窗"
+        android:id="@+id/createFloatView"
+        android:layout_below="@id/unbindService"
+        android:layout_alignParentStart="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="關閉懸浮視窗"
+        android:id="@+id/destroyFloatView"
+        android:layout_below="@id/unbindService"
+        android:layout_toRightOf="@id/createFloatView"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="啟動背景服務"
+        android:id="@+id/startBgService"
+        android:layout_below="@id/createFloatView"
+        android:layout_alignParentStart="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止背景服務"
+        android:id="@+id/stopBgService"
+        android:layout_below="@id/createFloatView"
+        android:layout_toRightOf="@id/startBgService"/>
+
+</RelativeLayout>

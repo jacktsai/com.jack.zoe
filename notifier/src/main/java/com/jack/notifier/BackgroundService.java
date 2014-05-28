@@ -70,7 +70,10 @@ public class BackgroundService extends Service {
     }
 
     private void onExitClick() {
-        onStopAction();
+        if (running) {
+            onActionToggle();
+        }
+
         stopSelf();
     }
 

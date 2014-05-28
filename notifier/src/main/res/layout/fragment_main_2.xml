@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="選取圖片"
+        android:id="@+id/pickupPicture"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="查詢所有圖片"
+        android:id="@+id/queryAllImages"
+        android:layout_toRightOf="@id/pickupPicture" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="查詢所有相簿"
+        android:id="@+id/queryAllBuckets"
+        android:layout_toRightOf="@id/queryAllImages"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="媒體掃瞄器狀態"
+        android:id="@+id/checkMediaScanner"
+        android:layout_below="@+id/pickupPicture"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="查詢內容提供者"
+        android:id="@+id/showContentProviders"
+        android:layout_below="@+id/pickupPicture"
+        android:layout_toRightOf="@id/checkMediaScanner" />
+
+</RelativeLayout>
