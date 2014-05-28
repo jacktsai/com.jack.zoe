@@ -70,20 +70,12 @@ public class MainActivity extends Activity {
         this.adapter = new PicturesAdapter();
         this.imagePager = (ViewPager)super.findViewById(R.id.imagePager);
         this.imagePager.setAdapter(adapter);
-        this.imagePager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
+        this.imagePager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 currentImageIndex = position;
                 stopScrollImage();
                 startScrollImage();
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
             }
         });
         this.startScrollImage();
