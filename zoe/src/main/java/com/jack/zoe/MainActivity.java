@@ -31,6 +31,7 @@ import com.jack.zoe.util.J;
 
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -46,16 +47,13 @@ public class MainActivity extends Activity {
     private ViewPager imagePager;
     private MessageAnimation messageAnimator;
     private int musicVolumeBefore;
-    private MediaPlayer mp3Player;
+    private BackgroundMusic bgm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setTitle(R.string.main_title);
         this.setContentView(R.layout.activity_main);
-
-        this.messageAnimator = new MessageAnimation();
-        this.messageAnimator.start();
 
         AudioManager audioManager = (AudioManager)this.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         musicVolumeBefore = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -65,7 +63,9 @@ public class MainActivity extends Activity {
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, suggestedVolume, 0);
             }
         }
-        this.startBGM();
+
+        this.bgm = new BackgroundMusic();
+        this.bgm.playNext();
 
         this.adapter = new PicturesAdapter();
         this.imagePager = (ViewPager)super.findViewById(R.id.imagePager);
@@ -86,19 +86,21 @@ public class MainActivity extends Activity {
             public void onPageScrollStateChanged(int state) {
             }
         });
-
         this.startScrollImage();
+
+        this.messageAnimator = new MessageAnimation();
+        this.messageAnimator.start();
     }
 
     @Override
     protected void onDestroy() {
-        this.stopBGM();
+        this.messageAnimator.cancel();
+        this.bgm.destroy();
+        this.stopScrollImage();
 
         AudioManager audioManager = (AudioManager)this.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, musicVolumeBefore, 0);
 
-        this.messageAnimator.cancel();
-        this.stopScrollImage();
         super.onDestroy();
     }
 
@@ -121,35 +123,6 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onResume() {
-        J.d(TAG, "onResume");
-        this.mp3Player.start();
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        J.d(TAG, "onPause");
-        this.mp3Player.pause();
-        super.onPause();
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            if (this.messageAnimator.getFinished()) {
-                this.messageAnimator.start();
-
-                this.mp3Player.seekTo(this.mp3Player.getDuration());
-
-                return true;
-            }
-        }
-
-        return super.onTouchEvent(event);
-    }
-
     private void startScrollImage() {
         this.imageScrollTimer = new Timer();
         this.imageScrollTimer.schedule(new ImageScrollTask(), 5000);
@@ -159,25 +132,42 @@ public class MainActivity extends Activity {
         this.imageScrollTimer.cancel();
     }
 
-    private void startBGM() {
-        int[] mp3Array = new int[] { R.raw.dance_of_the_dragonfly, R.raw.sundial_reams, R.raw.through_the_arbor };
-        Random r = new Random();
-        int selected = mp3Array[r.nextInt(mp3Array.length)];
+    class BackgroundMusic {
+        private int[] musicArray;
+        private Random r = new Random();
+        private MediaPlayer mp3Player;
 
-        this.mp3Player = MediaPlayer.create(this, selected);
-        this.mp3Player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                startBGM();
-                mp3Player.start();
+        BackgroundMusic() {
+            Field[] fields = R.raw.class.getDeclaredFields();
+            musicArray = new int[fields.length];
+            for (int i = 0; i < fields.length; i++) {
+                try {
+                    int resId = fields[i].getInt(null);
+                    musicArray[i] = resId;
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             }
-        });
-        this.mp3Player.setVolume(1, 1);
-    }
+        }
 
-    private void stopBGM(){
-        this.mp3Player.stop();
-        this.mp3Player.release();
+        public void playNext() {
+            int selected = musicArray[r.nextInt(musicArray.length)];
+
+            mp3Player = MediaPlayer.create(MainActivity.this, selected);
+            mp3Player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    playNext();
+                }
+            });
+            mp3Player.setVolume(1, 1);
+            mp3Player.start();
+        }
+
+        public void destroy() {
+            mp3Player.stop();
+            mp3Player.release();
+        }
     }
 
     class PicturesAdapter extends PagerAdapter implements Settings.Sliding.OnChangeListener {
