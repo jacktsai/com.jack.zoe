@@ -18,30 +18,24 @@ import com.jack.notifier.util.J;
 public class EmptyService extends Service {
     private static final String TAG = EmptyService.class.getSimpleName();
 
-//    private MyFloatMenu floatMenu;
-    private FloatingMenu floatingMenu;
+    private MyFloatMenu floatMenu;
 
     @Override
     public void onCreate() {
         J.i(TAG, "onCreate");
-//        floatMenu = new MyFloatMenu(this);
-        floatingMenu = new FloatingMenu(this);
+        floatMenu = new MyFloatMenu(this);
     }
 
     @Override
     public void onDestroy() {
         J.i(TAG, "onDestroy");
-//        floatMenu.dismiss();
-        floatingMenu.dismiss();
+        floatMenu.dismiss();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId) {
         J.i(TAG, "onStartCommand, flags=%d, startId=%d", flags, startId);
-
-//        floatMenu.show();
-        floatingMenu.show();
-
+        floatMenu.show();
         return super.onStartCommand(intent, flags, startId);
     }
 

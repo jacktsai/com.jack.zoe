@@ -7,9 +7,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,7 +29,7 @@ import com.jack.notifier.util.J;
 public class FloatingMenu extends FrameLayout {
     private static final String TAG = FloatingMenu.class.getSimpleName();
 
-    private static final WindowManager.LayoutParams createLayoutParams() {
+    private static WindowManager.LayoutParams createLayoutParams() {
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
         layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
         layoutParams.format = PixelFormat.TRANSLUCENT;
@@ -45,7 +45,14 @@ public class FloatingMenu extends FrameLayout {
     private float startX, startY;
     private int touchSlop;
 
-    public FloatingMenu(final EmptyService context) {
+    private TextView modeView;
+    private ImageView actionView;
+    private Bitmap startIcon, stopIcon;
+    private Animation stopAnimation;
+    private Bitmap settingIcon;
+    private Bitmap exitIcon;
+
+    public FloatingMenu(final Context context, final Handler handler) {
         super(context);
 
         windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
@@ -60,125 +67,138 @@ public class FloatingMenu extends FrameLayout {
         int iconWidth = (int)(displayMetrics.widthPixels * 0.125);
         int iconHeight = iconWidth;
 
-        final TextView mode = (TextView)findViewById(R.id.mode);
-        mode.setLayoutParams(new LinearLayout.LayoutParams(iconWidth, iconHeight));
-        mode.setHapticFeedbackEnabled(true);
-        mode.setText("A");
-        mode.setOnClickListener(new View.OnClickListener() {
-            private boolean currentMode = true;
+        modeView = (TextView)findViewById(R.id.mode);
+        modeView.setLayoutParams(new LinearLayout.LayoutParams(iconWidth, iconHeight));
+        modeView.setHapticFeedbackEnabled(true);
+        modeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentMode) {
-                    mode.setText("M");
-                    currentMode = false;
-                } else {
-                    mode.setText("A");
-                    currentMode = true;
-                }
+                handler.sendEmptyMessage(BackgroundService.MSG_MODE_TOGGLE);
             }
         });
 
-        final Bitmap performIcon = createPerformIcon(iconWidth, iconHeight);
-        final Bitmap stopIcon = createStopIcon(iconWidth, iconHeight);
-        final Animation stopAnimation = new AlphaAnimation(1.0f, 0.4f);
+        startIcon = createStartIcon(iconWidth, iconHeight);
+        stopIcon = createStopIcon(iconWidth, iconHeight);
+        stopAnimation = new AlphaAnimation(1.0f, 0.4f);
         stopAnimation.setDuration(1000);
         stopAnimation.setInterpolator(new LinearInterpolator());
         stopAnimation.setRepeatCount(AlphaAnimation.INFINITE);
         stopAnimation.setRepeatMode(AlphaAnimation.REVERSE);
-        final ImageView perform = (ImageView)findViewById(R.id.perform);
-        perform.setHapticFeedbackEnabled(true);
-        perform.setImageBitmap(performIcon);
-        perform.setOnClickListener(new View.OnClickListener() {
-            private boolean performing = false;
+        actionView = (ImageView)findViewById(R.id.action);
+        actionView.setHapticFeedbackEnabled(true);
+        actionView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (performing) {
-                    perform.clearAnimation();
-                    perform.setImageBitmap(performIcon);
-                    perform.setBackgroundResource(R.drawable.floating_menu_border1);
-                    performing = false;
-                } else {
-                    perform.setImageBitmap(stopIcon);
-                    perform.setBackgroundResource(R.drawable.floating_menu_processing);
-                    perform.startAnimation(stopAnimation);
-                    performing = true;
-                }
+                handler.sendEmptyMessage(BackgroundService.MSG_ACTION_TOGGLE);
             }
         });
 
-        final Bitmap settingIcon = createSettingIcon(iconWidth, iconHeight);
-        ImageView setting = (ImageView)findViewById(R.id.setting);
-        setting.setHapticFeedbackEnabled(true);
-        setting.setImageBitmap(settingIcon);
-        setting.setOnClickListener(new View.OnClickListener() {
+        settingIcon = createSettingIcon(iconWidth, iconHeight);
+        ImageView settingView = (ImageView)findViewById(R.id.setting);
+        settingView.setHapticFeedbackEnabled(true);
+        settingView.setImageBitmap(settingIcon);
+        settingView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                handler.sendEmptyMessage(BackgroundService.MSG_SETTING_CLICK);
             }
         });
 
-        final Bitmap exitIcon = createExitIcon(iconWidth, iconHeight);
-        ImageView exit = (ImageView)findViewById(R.id.exit);
-        exit.setHapticFeedbackEnabled(true);
-        exit.setImageBitmap(exitIcon);
-        exit.setOnClickListener(new View.OnClickListener() {
+        exitIcon = createExitIcon(iconWidth, iconHeight);
+        ImageView exitView = (ImageView)findViewById(R.id.exit);
+        exitView.setHapticFeedbackEnabled(true);
+        exitView.setImageBitmap(exitIcon);
+        exitView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                context.stopSelf();
+                handler.sendEmptyMessage(BackgroundService.MSG_EXIT_CLICK);
             }
         });
 
         touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+        windowManager.addView(this, layoutParams);
+    }
+
+    public void onDestroy() {
+        windowManager.removeView(this);
+
+        startIcon.recycle();
+        stopIcon.recycle();
+        settingIcon.recycle();
+        exitIcon.recycle();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                J.d(TAG, "onTouchEvent_ACTION_DOWN");
+                break;
+            case MotionEvent.ACTION_UP:
+                J.d(TAG, "onTouchEvent_ACTION_UP");
+                break;
             case MotionEvent.ACTION_MOVE:
+                J.d(TAG, "onTouchEvent_ACTION_MOVE");
                 float x = event.getRawX();
                 float y = event.getRawY();
-                layoutParams.x = (int)(layoutParams.x - startX + x);
-                layoutParams.y = (int)(layoutParams.y - startY + y);
+                layoutParams.x = (int) (layoutParams.x - startX + x);
+                layoutParams.y = (int) (layoutParams.y - startY + y);
                 windowManager.updateViewLayout(this, layoutParams);
                 startX = x;
                 startY = y;
+                return true;
+            case MotionEvent.ACTION_CANCEL:
+                J.d(TAG, "onTouchEvent_ACTION_CANCEL");
                 break;
         }
 
-        return true;
+        return super.onTouchEvent(event);
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                J.d(TAG, "onInterceptTouchEvent_ACTION_DOWN");
                 startX = event.getRawX();
                 startY = event.getRawY();
                 break;
+            case MotionEvent.ACTION_UP:
+                J.d(TAG, "onInterceptTouchEvent_ACTION_UP");
+                break;
             case MotionEvent.ACTION_MOVE:
+                J.d(TAG, "onInterceptTouchEvent_ACTION_MOVE");
                 float x = event.getRawX();
                 float y = event.getRawY();
-                if ((Math.abs(startX - x) >= touchSlop || Math.abs(startY - y) >= touchSlop) && event.getPointerCount() == 1) {
+                if ((Math.abs(startX - x) >= touchSlop || Math.abs(startY - y) >= touchSlop)) {
                     return true;
                 }
                 break;
+            case MotionEvent.ACTION_CANCEL:
+                J.d(TAG, "onInterceptTouchEvent_ACTION_CANCEL");
+                break;
         }
 
-        return false;
+        return super.onInterceptTouchEvent(event);
     }
 
-    public void show() {
-        if (!isShown()) {
-            windowManager.addView(this, layoutParams);
+    public void updateMode(String mode) {
+        modeView.setText(mode);
+    }
+
+    public void updateAction(boolean running) {
+        if (running) {
+            actionView.setImageBitmap(stopIcon);
+            actionView.setBackgroundResource(R.drawable.floating_menu_processing);
+            actionView.startAnimation(stopAnimation);
+        } else {
+            actionView.clearAnimation();
+            actionView.setImageBitmap(startIcon);
+            actionView.setBackgroundResource(R.drawable.floating_menu_border1);
         }
     }
 
-    public void dismiss() {
-        if (isShown()) {
-            windowManager.removeView(this);
-        }
-    }
-
-    private Bitmap createPerformIcon(int width, int height) {
+    private Bitmap createStartIcon(int width, int height) {
         Path path = new Path();
         path.setFillType(Path.FillType.EVEN_ODD);
         path.moveTo(width / 3, height / 4 + height / 20);

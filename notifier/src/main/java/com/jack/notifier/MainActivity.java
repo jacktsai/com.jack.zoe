@@ -164,7 +164,7 @@ public class MainActivity extends Activity {
         this.findViewById(R.id.stopService).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                J.i(TAG, "stopService_onClick");
+                J.d(TAG, "stopService_onClick");
                 stopService(new Intent(MainActivity.this, EmptyService.class));
             }
         });
@@ -172,19 +172,19 @@ public class MainActivity extends Activity {
         final ServiceConnection connection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-                J.i(TAG, "onServiceConnected");
+                J.d(TAG, "onServiceConnected");
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
-                J.i(TAG, "onServiceDisconnected");
+                J.d(TAG, "onServiceDisconnected");
             }
         };
 
         this.findViewById(R.id.bindService).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                J.i(TAG, "bindService_onClick");
+                J.d(TAG, "bindService_onClick");
                 bindService(new Intent(MainActivity.this, EmptyService.class), connection, Context.BIND_AUTO_CREATE);
             }
         });
@@ -192,7 +192,7 @@ public class MainActivity extends Activity {
         this.findViewById(R.id.unbindService).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                J.i(TAG, "unbindService_onClick");
+                J.d(TAG, "unbindService_onClick");
                 unbindService(connection);
             }
         });
@@ -200,7 +200,7 @@ public class MainActivity extends Activity {
         this.findViewById(R.id.createFloatView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                J.i(TAG, "createFloatView_onClick");
+                J.d(TAG, "createFloatView_onClick");
                 createFloatView();
             }
         });
@@ -208,8 +208,24 @@ public class MainActivity extends Activity {
         this.findViewById(R.id.destroyFloatView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                J.i(TAG, "destroyFloatView_onClick");
+                J.d(TAG, "destroyFloatView_onClick");
                 destroyFloatView();
+            }
+        });
+
+        this.findViewById(R.id.startBgService).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                J.d(TAG, "startBgService_onClick");
+                startService(new Intent(MainActivity.this, BackgroundService.class));
+            }
+        });
+
+        this.findViewById(R.id.stopBgService).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                J.d(TAG, "stopBgService_onClick");
+                stopService(new Intent(MainActivity.this, BackgroundService.class));
             }
         });
     }

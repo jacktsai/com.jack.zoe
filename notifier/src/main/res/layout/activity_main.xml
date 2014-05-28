@@ -155,4 +155,20 @@
         android:layout_below="@id/unbindService"
         android:layout_toRightOf="@id/createFloatView"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="啟動背景服務"
+        android:id="@+id/startBgService"
+        android:layout_below="@id/createFloatView"
+        android:layout_alignParentStart="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止背景服務"
+        android:id="@+id/stopBgService"
+        android:layout_below="@id/createFloatView"
+        android:layout_toRightOf="@id/startBgService"/>
+
 </RelativeLayout>
