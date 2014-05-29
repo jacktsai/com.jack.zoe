@@ -16,13 +16,13 @@ import android.widget.SeekBar;
 
 import com.jack.notifier.util.J;
 
-public class MaskViewSetting {
-    private static final String TAG = MaskViewSetting.class.getSimpleName();
+public class MaskSettingView {
+    private static final String TAG = MaskSettingView.class.getSimpleName();
 
-    public MaskViewSetting(final Context context, final MaskView maskView) {
+    public MaskSettingView(final Context context, final MaskView maskView) {
         final WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
         final LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View rootView = layoutInflater.inflate(R.layout.mask_view_setting, null);
+        final View rootView = layoutInflater.inflate(R.layout.view_mask_setting, null);
 
         Button close = (Button)rootView.findViewById(R.id.close);
         close.setOnClickListener(new View.OnClickListener() {
@@ -36,8 +36,6 @@ public class MaskViewSetting {
         final SeekBar red = (SeekBar)rootView.findViewById(R.id.red);
         final SeekBar green = (SeekBar)rootView.findViewById(R.id.green);
         final SeekBar blue = (SeekBar)rootView.findViewById(R.id.blue);
-        final CheckBox layout_in_screen = (CheckBox)rootView.findViewById(R.id.layout_in_screen);
-        final CheckBox layout_inset_decor = (CheckBox)rootView.findViewById(R.id.layout_inset_decor);
 
         ColorDrawable colorDrawable = (ColorDrawable)maskView.getBackground();
         int color = colorDrawable.getColor();
@@ -67,48 +65,57 @@ public class MaskViewSetting {
         green.setOnSeekBarChangeListener(onSeekBarChangeListener);
         blue.setOnSeekBarChangeListener(onSeekBarChangeListener);
 
-        final LayoutParams maskViewLayoutParams = maskView.getLayoutParams();
-        layout_in_screen.setChecked((maskViewLayoutParams.flags & LayoutParams.FLAG_LAYOUT_IN_SCREEN) != 0);
+        int maskViewFlags = maskView.getLayoutParams().flags;
+
+        CheckBox layout_in_screen = (CheckBox)rootView.findViewById(R.id.layout_in_screen);
+        layout_in_screen.setChecked((maskViewFlags & LayoutParams.FLAG_LAYOUT_IN_SCREEN) != 0);
         layout_in_screen.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                int flags = maskViewLayoutParams.flags;
-                if (isChecked) {
-                    flags = flags | LayoutParams.FLAG_LAYOUT_IN_SCREEN;
-                } else {
-                    flags = flags & ~LayoutParams.FLAG_LAYOUT_IN_SCREEN;
-                }
-
-                J.d(TAG, "mask view flags, old 0x%x, new 0x%x", maskViewLayoutParams.flags, flags);
-                maskViewLayoutParams.flags = flags;
-                maskView.update();
+                updateMaskViewFlag(maskView, LayoutParams.FLAG_LAYOUT_IN_SCREEN, isChecked);
             }
         });
-        layout_inset_decor.setChecked((maskViewLayoutParams.flags & LayoutParams.FLAG_LAYOUT_INSET_DECOR) != 0);
+
+        CheckBox fullscreen = (CheckBox)rootView.findViewById(R.id.fullscreen);
+        fullscreen.setChecked((maskViewFlags & LayoutParams.FLAG_FULLSCREEN) != 0);
+        fullscreen.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateMaskViewFlag(maskView, LayoutParams.FLAG_FULLSCREEN, isChecked);
+            }
+        });
+
+        CheckBox layout_inset_decor = (CheckBox)rootView.findViewById(R.id.layout_inset_decor);
+        layout_inset_decor.setChecked((maskViewFlags & LayoutParams.FLAG_LAYOUT_INSET_DECOR) != 0);
         layout_inset_decor.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                int flags = maskViewLayoutParams.flags;
-                if (isChecked) {
-                    flags = flags | LayoutParams.FLAG_LAYOUT_INSET_DECOR;
-                } else {
-                    flags = flags & ~LayoutParams.FLAG_LAYOUT_INSET_DECOR;
-                }
-
-                J.d(TAG, "mask view flags, old 0x%x, new 0x%x", maskViewLayoutParams.flags, flags);
-                maskViewLayoutParams.flags = flags;
-                maskView.update();
+                updateMaskViewFlag(maskView, LayoutParams.FLAG_LAYOUT_INSET_DECOR, isChecked);
             }
         });
 
         LayoutParams layoutParams = new LayoutParams();
-        layoutParams.type = LayoutParams.TYPE_SYSTEM_ERROR;
+        layoutParams.type = LayoutParams.TYPE_PHONE;
         layoutParams.format = PixelFormat.TRANSLUCENT;
-        layoutParams.flags = LayoutParams.FLAG_NOT_FOCUSABLE;
         layoutParams.width = LayoutParams.MATCH_PARENT;
         layoutParams.height = LayoutParams.WRAP_CONTENT;
         layoutParams.gravity = Gravity.BOTTOM;
 
         windowManager.addView(rootView, layoutParams);
+    }
+
+    private static void updateMaskViewFlag(MaskView maskView, int targetFlag, boolean isChecked) {
+        LayoutParams layoutParams = maskView.getLayoutParams();
+        int flags = layoutParams.flags;
+
+        if (isChecked) {
+            flags = flags | targetFlag;
+        } else {
+            flags = flags & ~targetFlag;
+        }
+
+        J.d(TAG, "mask view flags, old 0x%x, new 0x%x", layoutParams.flags, flags);
+        layoutParams.flags = flags;
+        maskView.update();
     }
 }

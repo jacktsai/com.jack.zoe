@@ -32,8 +32,8 @@ public class MaskView extends View {
         layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
         layoutParams.flags =
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE |
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         layoutParams.format = PixelFormat.TRANSLUCENT;
     }
 

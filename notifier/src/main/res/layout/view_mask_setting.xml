@@ -3,7 +3,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#55000000">
+    android:background="#77000000">
 
     <Button
         android:id="@+id/close"
@@ -19,7 +19,8 @@
         android:layout_below="@+id/close"
         android:layout_alignParentStart="true"
         android:text="透明"
-        android:textSize="27sp"/>
+        android:textSize="27sp"
+        android:textColor="@android:color/white"/>
 
     <SeekBar
         android:id="@+id/alpha"
@@ -36,7 +37,8 @@
         android:layout_below="@+id/alphaLabel"
         android:layout_alignParentStart="true"
         android:text="紅色"
-        android:textSize="27sp"/>
+        android:textSize="27sp"
+        android:textColor="#ffff0000"/>
 
     <SeekBar
         android:id="@+id/red"
@@ -53,7 +55,8 @@
         android:layout_below="@+id/redLabel"
         android:layout_alignParentStart="true"
         android:text="綠色"
-        android:textSize="27sp"/>
+        android:textSize="27sp"
+        android:textColor="#ff00ff00"/>
 
     <SeekBar
         android:id="@+id/green"
@@ -70,7 +73,8 @@
         android:layout_below="@+id/greenLabel"
         android:layout_alignParentStart="true"
         android:text="藍色"
-        android:textSize="27sp"/>
+        android:textSize="27sp"
+        android:textColor="#ff0000ff"/>
 
     <SeekBar
         android:id="@+id/blue"
@@ -86,14 +90,25 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/blueLabel"
         android:layout_alignParentStart="true"
-        android:text="FLAG_LAYOUT_IN_SCREEN"/>
+        android:text="FLAG_LAYOUT_IN_SCREEN"
+        android:textColor="@android:color/white"/>
+
+    <CheckBox
+        android:id="@+id/fullscreen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layout_in_screen"
+        android:layout_alignParentStart="true"
+        android:text="FLAG_FULLSCREEN"
+        android:textColor="@android:color/white"/>
 
     <CheckBox
         android:id="@+id/layout_inset_decor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/layout_in_screen"
+        android:layout_below="@id/fullscreen"
         android:layout_alignParentStart="true"
-        android:text="FLAG_LAYOUT_INSET_DECOR"/>
+        android:text="FLAG_LAYOUT_INSET_DECOR"
+        android:textColor="@android:color/white"/>
 
 </RelativeLayout>

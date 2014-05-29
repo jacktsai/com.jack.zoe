@@ -369,7 +369,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     J.d(TAG, "openMask_onClick");
-                    startService(new Intent(MainActivity.this, MaskViewService.class));
+                    startService(new Intent(MainActivity.this, MaskService.class));
                 }
             });
 
@@ -377,7 +377,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     J.d(TAG, "closeMask_onClick");
-                    stopService(new Intent(MainActivity.this, MaskViewService.class));
+                    stopService(new Intent(MainActivity.this, MaskService.class));
                 }
             });
 
@@ -385,8 +385,8 @@ public class MainActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     J.d(TAG, "maskSetting_onClick");
-                    if (MaskViewService.maskView != null) {
-                        new MaskViewSetting(MainActivity.this, MaskViewService.maskView);
+                    if (MaskService.maskView != null) {
+                        new MaskSettingView(MainActivity.this, MaskService.maskView);
                     }
                 }
             });

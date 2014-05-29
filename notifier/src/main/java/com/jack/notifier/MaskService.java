@@ -6,8 +6,8 @@ import android.os.IBinder;
 
 import com.jack.notifier.util.J;
 
-public class MaskViewService extends Service {
-    private static final String TAG = MaskViewService.class.getSimpleName();
+public class MaskService extends Service {
+    private static final String TAG = MaskService.class.getSimpleName();
 
     public static MaskView maskView;
 
