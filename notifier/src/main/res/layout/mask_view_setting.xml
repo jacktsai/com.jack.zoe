@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#55000000">
+
+    <Button
+        android:id="@+id/close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="關閉"/>
+
+    <TextView
+        android:id="@+id/alphaLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/close"
+        android:layout_alignParentStart="true"
+        android:text="透明"
+        android:textSize="27sp"/>
+
+    <SeekBar
+        android:id="@+id/alpha"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/close"
+        android:layout_toRightOf="@+id/alphaLabel"
+        android:max="255"/>
+
+    <TextView
+        android:id="@+id/redLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/alphaLabel"
+        android:layout_alignParentStart="true"
+        android:text="紅色"
+        android:textSize="27sp"/>
+
+    <SeekBar
+        android:id="@+id/red"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/alphaLabel"
+        android:layout_toRightOf="@+id/redLabel"
+        android:max="255"/>
+
+    <TextView
+        android:id="@+id/greenLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/redLabel"
+        android:layout_alignParentStart="true"
+        android:text="綠色"
+        android:textSize="27sp"/>
+
+    <SeekBar
+        android:id="@+id/green"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/redLabel"
+        android:layout_toRightOf="@+id/greenLabel"
+        android:max="255"/>
+
+    <TextView
+        android:id="@+id/blueLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/greenLabel"
+        android:layout_alignParentStart="true"
+        android:text="藍色"
+        android:textSize="27sp"/>
+
+    <SeekBar
+        android:id="@+id/blue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/greenLabel"
+        android:layout_toRightOf="@+id/blueLabel"
+        android:max="255"/>
+
+    <CheckBox
+        android:id="@+id/layout_in_screen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/blueLabel"
+        android:layout_alignParentStart="true"
+        android:text="FLAG_LAYOUT_IN_SCREEN"/>
+
+    <CheckBox
+        android:id="@+id/layout_inset_decor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layout_in_screen"
+        android:layout_alignParentStart="true"
+        android:text="FLAG_LAYOUT_INSET_DECOR"/>
+
+</RelativeLayout>

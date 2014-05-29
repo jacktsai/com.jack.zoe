@@ -66,4 +66,28 @@
         android:layout_below="@id/createFloatView"
         android:layout_toRightOf="@id/startBgService"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="打開遮罩"
+        android:id="@+id/openMask"
+        android:layout_below="@id/stopBgService"
+        android:layout_alignParentStart="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="關閉遮罩"
+        android:id="@+id/closeMask"
+        android:layout_below="@id/stopBgService"
+        android:layout_toRightOf="@id/openMask"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="遮罩設定"
+        android:id="@+id/maskSetting"
+        android:layout_below="@id/stopBgService"
+        android:layout_toRightOf="@id/closeMask"/>
+
 </RelativeLayout>

@@ -3,7 +3,6 @@ package com.jack.notifier;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -17,39 +16,22 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.PixelFormat;
-import android.graphics.Rect;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v13.app.FragmentPagerAdapter;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.jack.notifier.util.J;
-import com.jack.notifier.util.Su;
-
-import java.io.IOException;
 
 public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -349,7 +331,10 @@ public class MainActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     J.d(TAG, "createFloatView_onClick");
-                    createFloatView();
+                    if (floatView == null) {
+                        floatView = new MyFloatView(MainActivity.this);
+                        floatView.show();
+                    }
                 }
             });
 
@@ -357,7 +342,10 @@ public class MainActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     J.d(TAG, "destroyFloatView_onClick");
-                    destroyFloatView();
+                    if (floatView != null) {
+                        floatView.dismiss();
+                        floatView = null;
+                    }
                 }
             });
 
@@ -377,21 +365,33 @@ public class MainActivity extends Activity {
                 }
             });
 
+            view.findViewById(R.id.openMask).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    J.d(TAG, "openMask_onClick");
+                    startService(new Intent(MainActivity.this, MaskViewService.class));
+                }
+            });
+
+            view.findViewById(R.id.closeMask).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    J.d(TAG, "closeMask_onClick");
+                    stopService(new Intent(MainActivity.this, MaskViewService.class));
+                }
+            });
+
+            view.findViewById(R.id.maskSetting).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    J.d(TAG, "maskSetting_onClick");
+                    if (MaskViewService.maskView != null) {
+                        new MaskViewSetting(MainActivity.this, MaskViewService.maskView);
+                    }
+                }
+            });
+
             return view;
-        }
-
-        private void createFloatView() {
-            if (floatView == null) {
-                floatView = new MyFloatView(MainActivity.this);
-                floatView.show();
-            }
-        }
-
-        private void destroyFloatView() {
-            if (floatView != null) {
-                floatView.dismiss();
-                floatView = null;
-            }
         }
     }
 
@@ -451,6 +451,8 @@ public class MainActivity extends Activity {
             ActionBar.Tab tab = actionBar.newTab().setText(section.title).setTabListener(tabListener);
             actionBar.addTab(tab);
         }
+
+        viewPager.setCurrentItem(2);
     }
 
     @Override
