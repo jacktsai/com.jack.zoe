@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileWriter;
 
 public class J {
-
     private static final String TAG = J.class.getSimpleName();
 
     public static void v(String tag, String format, Object... args) {

@@ -66,7 +66,31 @@ public class BackgroundService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        J.d(TAG, "onBind");
         return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        J.d(TAG, "onStartCommand, intent = %s, flags = %x, startId = %d", intent.toString(), flags, startId);
+        //int result = super.onStartCommand(intent, flags, startId);
+        int result = Service.START_REDELIVER_INTENT;
+        switch (result) {
+            case Service.START_STICKY_COMPATIBILITY:
+                J.d(TAG, "onStartCommand return START_STICKY_COMPATIBILITY");
+                break;
+            case Service.START_STICKY:
+                J.d(TAG, "onStartCommand return START_STICKY");
+                break;
+            case Service.START_NOT_STICKY:
+                J.d(TAG, "onStartCommand return START_NOT_STICKY");
+                break;
+            case Service.START_REDELIVER_INTENT:
+                J.d(TAG, "onStartCommand return START_REDELIVER_INTENT");
+                break;
+        }
+
+        return result;
     }
 
     private void onExitClick() {
