@@ -19,7 +19,7 @@ public class BackgroundService extends Service {
     private String currMode = "M";
     private boolean running = false;
     private FloatingMenu floatingMenu;
-    private InformUI informUI;
+    private InformView informView;
 
     private Handler handler = new Handler() {
         @Override
@@ -53,7 +53,7 @@ public class BackgroundService extends Service {
         floatingMenu.updateMode(currMode);
         floatingMenu.updateAction(running);
 
-        informUI = new InformUI(this);
+        informView = new InformView(this);
         J.i(TAG, "service [%s] created", this.getClass().getName());
     }
 
@@ -127,10 +127,10 @@ public class BackgroundService extends Service {
     }
 
     private void onStartAction() {
-        informUI.show();
+        informView.show();
     }
 
     private void onStopAction() {
-        informUI.dismiss();
+        informView.dismiss();
     }
 }

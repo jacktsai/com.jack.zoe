@@ -7,15 +7,18 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 
-public class InformUI extends TextView {
-    private static final String TAG = InformUI.class.getSimpleName();
+public class InformView extends TextView {
+    private static final String TAG = InformView.class.getSimpleName();
 
     private WindowManager windowManager;
     private WindowManager.LayoutParams layoutParams;
 
-    public InformUI(Context context) {
+    public InformView(Context context) {
         super(context);
 
         windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);

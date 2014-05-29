@@ -62,7 +62,7 @@ public class FloatingMenu extends FrameLayout {
         display.getMetrics(displayMetrics);
 
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.floating_menu_layout, this);
+        inflater.inflate(R.layout.floating_menu, this);
 
         int iconWidth = (int)(displayMetrics.widthPixels * 0.125);
         int iconHeight = iconWidth;
