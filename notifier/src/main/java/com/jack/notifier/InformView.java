@@ -3,6 +3,7 @@ package com.jack.notifier;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -23,17 +24,17 @@ public class InformView extends TextView {
 
         windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
 
-        DisplayMetrics displayMetrics = new DisplayMetrics();
         Display display = windowManager.getDefaultDisplay();
-        display.getMetrics(displayMetrics);
+        Point size = new Point();
+        display.getSize(size);
 
         layoutParams = new WindowManager.LayoutParams();
         layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
         layoutParams.format = PixelFormat.TRANSLUCENT;
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         layoutParams.gravity = Gravity.TOP;
-        layoutParams.width = displayMetrics.widthPixels;
-        layoutParams.height = (int)(displayMetrics.heightPixels * 0.4532);
+        layoutParams.width = size.x;
+        layoutParams.height = (int)(size.y * 0.4532);
 
         setText("運算中…");
         setTextSize(44);
