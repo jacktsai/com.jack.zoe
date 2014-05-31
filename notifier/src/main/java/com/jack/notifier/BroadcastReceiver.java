@@ -14,6 +14,6 @@ public class BroadcastReceiver extends android.content.BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         J.a(TAG, "onReceive, context = %s, intent = %s", context.toString(), intent.toString());
-        context.startService(new Intent(context, BackgroundService.class));
+        context.startService(new Intent(context, MaskService.class));
     }
 }

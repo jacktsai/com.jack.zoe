@@ -12,15 +12,19 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -28,10 +32,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.jack.notifier.util.J;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -370,6 +384,7 @@ public class MainActivity extends Activity {
                 public void onClick(View v) {
                     J.d(TAG, "openMask_onClick");
                     startService(new Intent(MainActivity.this, MaskService.class));
+                    MaskService.needRestart = true;
                 }
             });
 
@@ -377,6 +392,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     J.d(TAG, "closeMask_onClick");
+                    MaskService.needRestart = false;
                     stopService(new Intent(MainActivity.this, MaskService.class));
                 }
             });
@@ -388,6 +404,42 @@ public class MainActivity extends Activity {
                     if (MaskService.maskView != null) {
                         new MaskSettingView(MainActivity.this, MaskService.maskView);
                     }
+                }
+            });
+
+            return view;
+        }
+    }
+
+    public class SectionFragment4 extends Fragment {
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View view = inflater.inflate(R.layout.fragment_main_4, container, false);
+
+            String[] themeNames = getResources().getStringArray(R.array.theme_names);
+            String currentThemeName = getThemeName();
+            int currentSelection = -1;
+            for (int i = 0; i < themeNames.length; i++) {
+                if (currentThemeName.equals(themeNames[i])) {
+                    currentSelection = i;
+                    break;
+                }
+            }
+
+            ArrayAdapter<String> themesAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, themeNames);
+            Spinner themesSpinner = (Spinner)view.findViewById(R.id.themes);
+            themesSpinner.setAdapter(themesAdapter);
+            themesSpinner.setSelection(currentSelection);
+            themesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String themeName = (String)parent.getSelectedItem();
+                    J.i(TAG, "theme '%s' selected", themeName);
+                    setThemeName(themeName);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
                 }
             });
 
@@ -411,45 +463,55 @@ public class MainActivity extends Activity {
         section3.title = "系統服務";
         section3.fragment = new SectionFragment3();
 
-        sections = new Section[] {section1, section2, section3};
+        Section section4 = new Section();
+        section4.title = "活動主題";
+        section4.fragment = new SectionFragment4();
+
+        sections = new Section[] {section1, section2, section3, section4};
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setDisplayShowHomeEnabled(false);
-        actionBar.setDisplayShowTitleEnabled(false);
-
-        viewPager = (ViewPager)findViewById(R.id.pager);
-        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                actionBar.setSelectedNavigationItem(position);
-            }
-        });
+        viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(new Adapter());
 
-        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
-            @Override
-            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-                viewPager.setCurrentItem(tab.getPosition());
-            }
-            @Override
-            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+        final ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+            actionBar.setDisplayShowHomeEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(false);
 
-            }
-            @Override
-            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+            viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+                @Override
+                public void onPageSelected(int position) {
+                    actionBar.setSelectedNavigationItem(position);
+                }
+            });
 
+            ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+                @Override
+                public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                    viewPager.setCurrentItem(tab.getPosition());
+                }
+
+                @Override
+                public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+
+                }
+
+                @Override
+                public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+
+                }
+            };
+            for (Section section : sections) {
+                ActionBar.Tab tab = actionBar.newTab().setText(section.title).setTabListener(tabListener);
+                actionBar.addTab(tab);
             }
-        };
-        for (Section section : sections) {
-            ActionBar.Tab tab = actionBar.newTab().setText(section.title).setTabListener(tabListener);
-            actionBar.addTab(tab);
         }
 
         viewPager.setCurrentItem(2);
@@ -484,5 +546,25 @@ public class MainActivity extends Activity {
         Log.d(TAG, String.format("%s, %d, %s", uri, value2, value3));
 
         return value1;
+    }
+
+    private String getThemeName() {
+        String themeName = PreferenceManager.getDefaultSharedPreferences(this).getString("theme_name", "Theme_Holo_Light");
+        J.d(TAG, "theme is %s", themeName);
+        return themeName;
+    }
+
+    private void setThemeName(String themeName) {
+        J.d(TAG, "set theme to %s", themeName);
+        SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preference.edit();
+        editor.putString("theme_name", themeName);
+        editor.commit();
+    }
+
+    private void setTheme() {
+        Resources resources = getResources();
+        int themeId = resources.getIdentifier(getThemeName(), "style", "android");
+        setTheme(themeId);
     }
 }

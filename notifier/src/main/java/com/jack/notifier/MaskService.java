@@ -9,6 +9,7 @@ import com.jack.notifier.util.J;
 public class MaskService extends Service {
     private static final String TAG = MaskService.class.getSimpleName();
 
+    public static boolean needRestart = true;
     public static MaskView maskView;
 
     @Override
@@ -26,6 +27,11 @@ public class MaskService extends Service {
     public void onDestroy() {
         J.d(TAG, "onDestroy");
         maskView.hide();
+
+        if (needRestart) {
+            startService(new Intent(this, MaskService.class));
+        }
+
         J.i(TAG, "service [%s] destroyed", this.getClass().getName());
     }
 
