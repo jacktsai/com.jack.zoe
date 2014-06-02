@@ -17,46 +17,50 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
         <activity
-            android:name="com.jack.zoe.MainActivity"
-            android:label="@string/app_name" >
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
-
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name="com.jack.zoe.SettingsActivity"
-            android:label="@string/title_activity_settings" >
-        </activity>
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait"/>
+
         <activity
-            android:name="com.jack.zoe.GalleryPicker"
-            android:label="@string/title_activity_gallerypicker" >
+            android:name=".GalleryPicker"
+            android:label="@string/title_activity_gallerypicker"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <action android:name="com.jack.zoe.action.PICK_GALLERY" />
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".TosLootsActivity"
+            android:label="@string/title_activity_tos_loots"
+            android:screenOrientation="portrait"/>
+
         <service
-            android:name="com.jack.zoe.RoaringListener"
+            android:name=".RoaringListener"
             android:label="Notification Listener"
-            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
         <service
-            android:name="com.jack.zoe.MadHeadTosObserver"
+            android:name=".MadHeadTosObserver"
             android:label="ToS Observer" >
         </service>
 
-        <activity
-            android:name="com.jack.zoe.TosLootsActivity"
-            android:label="@string/title_activity_tos_loots" >
-        </activity>
     </application>
-
 </manifest>

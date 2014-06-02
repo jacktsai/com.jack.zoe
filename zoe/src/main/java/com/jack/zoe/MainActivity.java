@@ -115,6 +115,18 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onResume() {
+        bgm.resume();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        bgm.pause();
+        super.onPause();
+    }
+
     private void startScrollImage() {
         this.imageScrollTimer = new Timer();
         this.imageScrollTimer.schedule(new ImageScrollTask(), 5000);
@@ -160,12 +172,20 @@ public class MainActivity extends Activity {
             mp3Player.stop();
             mp3Player.release();
         }
+
+        public void pause() {
+            mp3Player.pause();
+        }
+
+        public void resume() {
+            mp3Player.start();
+        }
     }
 
     class PicturesAdapter extends PagerAdapter implements Settings.Sliding.OnChangeListener {
         private final String TAG = PicturesAdapter.class.getSimpleName();
 
-        private int[] picArray = new int[] { R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d, R.drawable.e, R.drawable.f, R.drawable.g, R.drawable.h, R.drawable.i, R.drawable.j };
+        private int[] picArray = new int[] { R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d, R.drawable.e, R.drawable.f, R.drawable.g, R.drawable.h, R.drawable.i, R.drawable.j, R.drawable.k };
         Settings.Sliding sliding;
         private ArrayList<String> imageList = new ArrayList<String>();
 
