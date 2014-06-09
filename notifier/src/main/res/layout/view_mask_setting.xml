@@ -28,7 +28,19 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/close"
         android:layout_toRightOf="@+id/alphaLabel"
-        android:max="255"/>
+        android:layout_toLeftOf="@+id/alphaValue"
+        android:max="255" />
+
+    <TextView
+        android:id="@+id/alphaValue"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/close"
+        android:layout_alignParentEnd="true"
+        android:text="255"
+        android:textSize="27sp"
+        android:textColor="@android:color/white"
+        android:gravity="right"/>
 
     <TextView
         android:id="@+id/redLabel"
@@ -46,7 +58,19 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/alphaLabel"
         android:layout_toRightOf="@+id/redLabel"
+        android:layout_toLeftOf="@+id/redValue"
         android:max="255"/>
+
+    <TextView
+        android:id="@+id/redValue"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/alphaLabel"
+        android:layout_alignParentEnd="true"
+        android:text="255"
+        android:textSize="27sp"
+        android:textColor="#ffff0000"
+        android:gravity="right"/>
 
     <TextView
         android:id="@+id/greenLabel"
@@ -64,7 +88,19 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/redLabel"
         android:layout_toRightOf="@+id/greenLabel"
+        android:layout_toLeftOf="@+id/greenValue"
         android:max="255"/>
+
+    <TextView
+        android:id="@+id/greenValue"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/redLabel"
+        android:layout_alignParentEnd="true"
+        android:text="255"
+        android:textSize="27sp"
+        android:textColor="#ff00ff00"
+        android:gravity="right"/>
 
     <TextView
         android:id="@+id/blueLabel"
@@ -82,7 +118,19 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/greenLabel"
         android:layout_toRightOf="@+id/blueLabel"
+        android:layout_toLeftOf="@+id/blueValue"
         android:max="255"/>
+
+    <TextView
+        android:id="@+id/blueValue"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/greenLabel"
+        android:layout_alignParentEnd="true"
+        android:text="255"
+        android:textSize="27sp"
+        android:textColor="#ff0000ff"
+        android:gravity="right"/>
 
     <CheckBox
         android:id="@+id/layout_in_screen"

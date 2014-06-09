@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.jack.notifier.util.J;
 
@@ -33,20 +34,27 @@ public class MaskSettingView {
         });
 
         final SeekBar alpha = (SeekBar)rootView.findViewById(R.id.alpha);
+        final TextView alphaValue = (TextView)rootView.findViewById(R.id.alphaValue);
         final SeekBar red = (SeekBar)rootView.findViewById(R.id.red);
+        final TextView redValue = (TextView)rootView.findViewById(R.id.redValue);
         final SeekBar green = (SeekBar)rootView.findViewById(R.id.green);
+        final TextView greenValue = (TextView)rootView.findViewById(R.id.greenValue);
         final SeekBar blue = (SeekBar)rootView.findViewById(R.id.blue);
-
-        ColorDrawable colorDrawable = (ColorDrawable)maskView.getBackground();
-        int color = colorDrawable.getColor();
-        alpha.setProgress(Color.alpha(color));
-        red.setProgress(Color.red(color));
-        green.setProgress(Color.green(color));
-        blue.setProgress(Color.blue(color));
+        final TextView blueValue = (TextView)rootView.findViewById(R.id.blueValue);
 
         SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (seekBar == alpha) {
+                    alphaValue.setText(Integer.toString(progress));
+                } else if (seekBar == red) {
+                    redValue.setText(Integer.toString(progress));
+                } else if (seekBar == green) {
+                    greenValue.setText(Integer.toString(progress));
+                } else if (seekBar == blue) {
+                    blueValue.setText(Integer.toString(progress));
+                }
+
                 int color = Color.argb(alpha.getProgress(), red.getProgress(), green.getProgress(), blue.getProgress());
                 maskView.setBackgroundColor(color);
             }
@@ -64,6 +72,13 @@ public class MaskSettingView {
         red.setOnSeekBarChangeListener(onSeekBarChangeListener);
         green.setOnSeekBarChangeListener(onSeekBarChangeListener);
         blue.setOnSeekBarChangeListener(onSeekBarChangeListener);
+
+        ColorDrawable colorDrawable = (ColorDrawable)maskView.getBackground();
+        int color = colorDrawable.getColor();
+        alpha.setProgress(Color.alpha(color));
+        red.setProgress(Color.red(color));
+        green.setProgress(Color.green(color));
+        blue.setProgress(Color.blue(color));
 
         int maskViewFlags = maskView.getLayoutParams().flags;
 

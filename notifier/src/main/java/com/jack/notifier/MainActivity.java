@@ -416,30 +416,11 @@ public class MainActivity extends Activity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.fragment_main_4, container, false);
 
-            String[] themeNames = getResources().getStringArray(R.array.theme_names);
-            String currentThemeName = getThemeName();
-            int currentSelection = -1;
-            for (int i = 0; i < themeNames.length; i++) {
-                if (currentThemeName.equals(themeNames[i])) {
-                    currentSelection = i;
-                    break;
-                }
-            }
-
-            ArrayAdapter<String> themesAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, themeNames);
-            Spinner themesSpinner = (Spinner)view.findViewById(R.id.themes);
-            themesSpinner.setAdapter(themesAdapter);
-            themesSpinner.setSelection(currentSelection);
-            themesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            view.findViewById(R.id.startQuickClip).setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String themeName = (String)parent.getSelectedItem();
-                    J.i(TAG, "theme '%s' selected", themeName);
-                    setThemeName(themeName);
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
+                public void onClick(View v) {
+                    J.d(TAG, "startQuickClip_onClick");
+                    sendBroadcast(new Intent("com.lge.QuickClip.action.START_QUICKCLIP"));
                 }
             });
 
@@ -464,7 +445,7 @@ public class MainActivity extends Activity {
         section3.fragment = new SectionFragment3();
 
         Section section4 = new Section();
-        section4.title = "活動主題";
+        section4.title = "其它";
         section4.fragment = new SectionFragment4();
 
         sections = new Section[] {section1, section2, section3, section4};
